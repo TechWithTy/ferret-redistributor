@@ -19,7 +19,10 @@ import (
     "github.com/bitesinbyte/ferret/pkg/config"
     "github.com/bitesinbyte/ferret/pkg/external"
     "github.com/bitesinbyte/ferret/pkg/metrics"
+    "github.com/bitesinbyte/ferret/pkg/telemetry"
     "strconv"
+    "github.com/bitesinbyte/ferret/pkg/cache"
+    "github.com/bitesinbyte/ferret/pkg/queue"
 )
 
 func main() {
@@ -50,11 +53,22 @@ func main() {
     defer db.Close()
 
     ctx := context.Background()
+    ctx = telemetry.InitFromEnv(ctx)
 
     postedCounter := metrics.NewCounter("poster_posted_total")
     failedCounter := metrics.NewCounter("poster_failed_total")
     postLatency := metrics.NewHistogram("poster_post_seconds")
     limiter := newPlatformLimiters(loadRatesFromEnv(), time.Second)
+
+    // Optional Valkey cache for dedupe/safety
+    var vcache *cache.Valkey
+    if vc, err := cache.NewValkey(cache.ValkeyConfig{}); err == nil {
+        _ = vc.Ping()
+        vcache = vc
+        defer vcache.Close()
+    } else {
+        log.Printf("valkey disabled: %v", err)
+    }
 
     for _, r := range rows {
         platform := strings.ToLower(string(r.Platform))
@@ -64,6 +78,15 @@ func main() {
             failedCounter.Inc(1)
             continue
         }
+        // Optional dedupe: skip if key exists (another runner is processing)
+        if vcache != nil {
+            k := "poster:processing:" + r.ID
+            if _, ok, _ := vcache.Get(k); ok {
+                log.Printf("skip duplicate processing for %s", r.ID)
+                continue
+            }
+            _ = vcache.Set(k, "1", 15*time.Minute)
+        }
         // Build the external.Post
         title := firstNonEmpty(r.ContentTitle.String, r.CampaignName)
         hashtags := r.Hashtags.String
@@ -71,9 +94,16 @@ func main() {
         post := external.Post{Title: title, Link: link, HashTags: hashtags, Description: ""}
 
         publishedAt := time.Now().UTC()
+        // Optional Pulsar events emitter
+        var prod *queue.PulsarProducer
+        if pc, cfg, err := queue.NewPulsarClientFromEnv(); err == nil && cfg.ServiceURL != "" {
+            if p, err := pc.NewProducer(cfg.Topic); err == nil { prod = p; defer prod.Close() }
+        }
         // If poster supports ID, capture and update
         var perr error
         postLatency.Time(func() {
+            var end func()
+            ctx, end = telemetry.StartSpan(ctx, "poster.publish", map[string]string{"platform": platform})
             // pace
             limiter.Take(platform)
             perr = doWithRetry(func() error {
@@ -85,13 +115,28 @@ func main() {
                 if err := poster.Post(cfg, post); err != nil { return err }
                 return calendar.UpdatePostStatus(ctx, db, r.ID, calendar.StatusPublished, nil, &publishedAt, nil)
             })
+            end()
         })
         if perr != nil {
             markFailed(ctx, db, r.ID, perr.Error())
             failedCounter.Inc(1)
+            telemetry.RecordCounter(ctx, "poster_failed_total", 1, map[string]string{"platform": platform})
         } else {
             postedCounter.Inc(1)
+            telemetry.RecordCounter(ctx, "poster_posted_total", 1, map[string]string{"platform": platform})
+            if prod != nil {
+                _ = prod.SendJSON(map[string]any{
+                    "type": "post.published",
+                    "id": r.ID,
+                    "platform": platform,
+                    "external_id": r.ExternalID.String,
+                    "published_at": publishedAt.Format(time.RFC3339),
+                    "campaign_id": r.CampaignID,
+                    "content_id": r.ContentID,
+                })
+            }
         }
+        if vcache != nil { _, _ = vcache.Del("poster:processing:" + r.ID) }
     }
     // Metrics snapshot for CI visibility
     if c,g,h := metrics.Snapshot(); true {

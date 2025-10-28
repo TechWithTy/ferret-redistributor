@@ -1,0 +1,23 @@
+version: 1
+metrics:
+  - name: scheduler.claimed_total
+    type: counter
+    description: Number of posts claimed by scheduler
+    attributes: []
+  - name: poster.posted_total
+    type: counter
+    description: Number of posts successfully published
+    attributes: [platform]
+  - name: poster.failed_total
+    type: counter
+    description: Number of posts failed to publish
+    attributes: [platform]
+  - name: poster.post_seconds
+    type: histogram
+    description: Time to publish a post
+    unit: seconds
+    attributes: [platform]
+  - name: cache.valkey.ops_total
+    type: counter
+    description: Valkey operations by command
+    attributes: [op]
