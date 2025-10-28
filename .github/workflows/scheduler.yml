@@ -1,0 +1,49 @@
+name: Scheduler Poll
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # Optional: if you want to dispatch a posting job in another workflow
+      DISPATCH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+      DISPATCH_EVENT: ${{ vars.DISPATCH_EVENT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+
+      - name: Build scheduler
+        working-directory: go
+        run: go build -o bin/scheduler ./cmd/scheduler
+
+      - name: Run scheduler (next 10 minutes)
+        working-directory: go
+        run: ./bin/scheduler --within 10m --json-array > due_posts.json
+
+      - name: Upload due posts artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: due-posts
+          path: go/due_posts.json
+
+      - name: Dispatch posting job (optional)
+        if: ${{ env.DISPATCH_TOKEN != '' && env.DISPATCH_EVENT != '' }}
+        run: |
+          repo="${{ github.repository }}"
+          api="https://api.github.com/repos/$repo/dispatches"
+          payload=$(jq -nc --arg event "$DISPATCH_EVENT" --argjson body '{"artifact":"due-posts","path":"go/due_posts.json"}' '{"event_type":$event, "client_payload": $body}')
+          curl -sS -X POST "$api" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $DISPATCH_TOKEN" \
+            -d "$payload"
+

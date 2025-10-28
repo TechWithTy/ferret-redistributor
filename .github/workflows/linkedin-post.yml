@@ -1,0 +1,41 @@
+name: LinkedIn Post
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    env:
+      # Required for LinkedIn posting
+      LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+
+      # Optional: other platforms or general config pulled by Ferret
+      MASTODON_INSTANCE_URL: ${{ vars.MASTODON_INSTANCE_URL }}
+      FACEBOOK_PAGE_ID: ${{ vars.FACEBOOK_PAGE_ID }}
+      THREAD_USER_ID: ${{ vars.THREAD_USER_ID }}
+
+      # Optional Instagram vars if you later enable Instagram in socials
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_GRAPH_VERSION: v19.0
+      IG_FIRST_COMMENT_TEXT: ${{ vars.IG_FIRST_COMMENT_TEXT }}
+      IG_TRIGGER_WORDS: ${{ vars.IG_TRIGGER_WORDS }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+
+      - name: Build Ferret
+        run: go build -o bin/ferret ./cmd/ferret
+
+      - name: Run Ferret
+        run: ./bin/ferret
+

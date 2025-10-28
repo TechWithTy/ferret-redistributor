@@ -1,0 +1,28 @@
+# Secrets
+analytics-deal-scale.json
+client_secrets.json
+*.sa.json
+*.key.json
+*.credentials.json
+service_account.key.json
+
+# Token caches
+.ga4_token.json
+*.token
+*.tokens
+
+# Local env
+.env
+.env.local
+.env.*.local
+
+# Python cache/build
+__pycache__/
+*.py[cod]
+*.egg-info/
+.cache/
+.pytest_cache/
+
+# Venv
+.venv/
+venv/

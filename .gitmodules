@@ -1,0 +1,42 @@
+[submodule "ai-ml-models"]
+	path = ai-ml-models
+	url = https://github.com/TechWithTy/python/ai-ml-models.git
+[submodule "google_trends"]
+	path = google_trends
+	url = https://github.com/TechWithTy/python/google_trends.git
+[submodule "google_analytics"]
+	path = google_analytics
+	url = https://github.com/TechWithTy/python/google_analytics.git
+[submodule "python/kling"]
+	path = python/kling
+	url = https://github.com/TechWithTy/kling.git
+[submodule "python/heygen_content"]
+	path = python/heygen_content
+	url = https://github.com/TechWithTy/heygen_content.git
+[submodule "python/creatify"]
+	path = python/creatify
+	url = https://github.com/TechWithTy/creatify.git
+[submodule "go/pkg/external/giphy"]
+	path = go/pkg/external/giphy
+	url = https://github.com/TechWithTy/giphy-go.git
+[submodule "python/clarity"]
+	path = python/clarity
+	url = https://github.com/TechWithTy/clarity.git
+[submodule "python/plausible"]
+	path = python/plausible
+	url = https://github.com/TechWithTy/plausible.git
+[submodule "python/google-search-console"]
+	path = python/google-search-console
+	url = https://github.com/TechWithTy/google-search-console-sdk.git
+[submodule "python/notion"]
+	path = python/notion
+	url = https://github.com/TechWithTy/notion.git
+[submodule "python/manychat"]
+	path = python/manychat
+	url = https://github.com/TechWithTy/manychat.git
+[submodule "go/pkg/external/unsplash"]
+	path = go/pkg/external/unsplash
+	url = https://github.com/hbagdi/go-unsplash.git
+[submodule "python/igify"]
+	path = python/igify
+	url = https://github.com/TechWithTy/IGIfy-Remastered.git

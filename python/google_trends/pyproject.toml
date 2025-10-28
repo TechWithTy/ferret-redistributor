@@ -1,0 +1,18 @@
+[project]
+name = "cyberoni-google-trends-sdk"
+version = "0.1.0"
+description = "Alpha scaffold SDK for Google Trends (unofficial placeholder until official API)."
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4",
+  "types-requests",
+]
+
+[tool]
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"

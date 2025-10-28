@@ -1,0 +1,94 @@
+name: Posting Runner
+
+on:
+  repository_dispatch:
+    types: [schedule-posts]
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure jq present
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
+
+      - name: Download due-posts artifact
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: due-posts
+          path: go
+        continue-on-error: true
+
+      - name: Check artifact exists
+        id: check
+        run: |
+          FILE="go/due_posts.json"
+          if [ ! -f "$FILE" ]; then
+            echo "No due_posts.json artifact found; nothing to post."
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "found=true" >> $GITHUB_OUTPUT
+
+      - name: Validate JSON and presence of items
+        if: steps.check.outputs.found == 'true'
+        id: validate
+        run: |
+          FILE="go/due_posts.json"
+          # Validate JSON structure (must be an array)
+          if ! jq -e 'type == "array"' "$FILE" >/dev/null; then
+            echo "Invalid JSON (expected array)." >&2
+            exit 1
+          fi
+          COUNT=$(jq 'length' "$FILE")
+          echo "Found $COUNT scheduled items"
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: No items; exit gracefully
+        if: steps.validate.outputs.count == '0'
+        run: echo "No scheduled items to post."
+
+      - name: Preview items (edge-case safe)
+        if: steps.validate.outputs.count != '0'
+        run: |
+          FILE="go/due_posts.json"
+          jq -r '.[] | "ID=(.ID) PLATFORM=(.Platform) WHEN=(.ScheduledAt) CAPTION=(.Caption // "")"' "$FILE" || true
+
+      # Placeholder: Invoke your posting logic here (CLI/service)
+      # Example: Call a self-hosted API to execute posts
+      - name: Dispatch to posting service (optional)
+        if: ${{ env.POSTING_ENDPOINT != '' && env.POSTING_API_KEY != '' && steps.validate.outputs.count != '0' }}
+        env:
+          POSTING_ENDPOINT: ${{ vars.POSTING_ENDPOINT }}
+          POSTING_API_KEY: ${{ secrets.POSTING_API_KEY }}
+        run: |
+          FILE="go/due_posts.json"
+          curl -sS -X POST "$POSTING_ENDPOINT/run" \
+            -H "Authorization: Bearer $POSTING_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data-binary @"$FILE"
+
+      - name: Setup Go (for local poster CLI)
+        if: steps.validate.outputs.count != '0'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+
+      - name: Build poster CLI
+        if: steps.validate.outputs.count != '0'
+        run: go build -o go/bin/poster ./go/cmd/poster
+
+      - name: Run poster (updates DB)
+        if: steps.validate.outputs.count != '0'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          go/bin/poster --input go/due_posts.json --database "$DATABASE_URL" --config config.json

@@ -18,6 +18,7 @@ All updated docs and blog posts related to ferret can be found [here](https://bl
 | Twitter(X) | Supported |
 | Facebook   | Supported |
 | Thread     | Supported |
+| Instagram  | Supported |
 
 ## Configuration
 
@@ -134,6 +135,12 @@ FACEBOOK_ACCESS_TOKEN=
 FACEBOOK_PAGE_ID=
 THREAD_USER_ID=
 THREAD_ACCESS_TOKEN=
+IG_ACCESS_TOKEN=
+IG_USER_ID=
+IG_GRAPH_VERSION=
+IG_FIRST_COMMENT_TEXT=
+IG_TRIGGER_WORDS=
+IG_MESSAGING_ENABLED=
 ```
 
 Fill in the values for these variables according to your environment.
@@ -160,6 +167,19 @@ This command will execute the compiled ferret binary and start the application l
 <span style='color: red;'>Note</span>
 
 Ensure all required environment variables are correctly set in the .env file before running the application.
+
+## Instagram Automation
+
+- Uses Instagram Graph API container + publish for feed posts, reels (with processing polling), and stories (permissions required).
+- Optional first comment: set `IG_FIRST_COMMENT_TEXT` to auto-post right after publish.
+- Trigger-to-DM: worker at `pkg/external/instagram/wokers/comments_dm.go` scans comments for words from `IG_TRIGGER_WORDS` and requests a DM message from your AI generator (`pkg/ai/generator`). DM sending requires Instagram Messaging; otherwise it’s skipped/unsupported.
+
+Environment variables:
+
+- `IG_ACCESS_TOKEN`, `IG_USER_ID`, `IG_GRAPH_VERSION` (default v19.0)
+- `IG_FIRST_COMMENT_TEXT` – optional first comment content
+- `IG_TRIGGER_WORDS` – comma-separated triggers, e.g., `READY,TEMPLATE`
+- `IG_MESSAGING_ENABLED` – set `true` only if messaging is configured
 
 ## License
 

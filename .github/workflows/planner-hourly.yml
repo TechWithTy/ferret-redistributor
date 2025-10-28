@@ -1,0 +1,35 @@
+name: Planner Hourly
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+
+      - name: Build planner
+        working-directory: go
+        run: go build -o bin/planner ./cmd/planner
+
+      - name: Ensure artifacts exist
+        run: |
+          test -f _data/trends.json || echo '[]' > _data/trends.json
+          test -f _data/variants.json || echo '{}' > _data/variants.json
+
+      - name: Run planner (schedule posts)
+        working-directory: go
+        run: |
+          ./bin/planner --trends ../_data/trends.json --variants ../_data/variants.json --spacing 2h --start-offset 15m
+

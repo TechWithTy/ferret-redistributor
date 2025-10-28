@@ -1,0 +1,84 @@
+name: Nightly Analytics
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    env:
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_GRAPH_VERSION: v19.0
+      LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+      # Optional dashboard push
+      DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+
+      - name: Build Analytics CLI
+        working-directory: go
+        run: |
+          go build -o bin/analytics ./cmd/analytics
+
+      - name: Instagram Bulk Analytics (last 72h)
+        working-directory: go
+        run: |
+          ./bin/analytics --platform instagram --bulk --since 72h --metrics impressions,reach > analytics_instagram.json
+
+      - name: LinkedIn Bulk Analytics (last 7d)
+        working-directory: go
+        run: |
+          ./bin/analytics --platform linkedin --bulk --since 168h > analytics_linkedin.json
+      - name: (Optional) YouTube Analytics Example (single)
+        if: ${{ env.YOUTUBE_API_KEY != '' }}
+        working-directory: go
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -n "${{ vars.YOUTUBE_VIDEO_ID }}" ]; then ./bin/analytics --platform youtube --id "${{ vars.YOUTUBE_VIDEO_ID }}" > analytics_youtube.json; fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-analytics
+          path: |
+            go/analytics_instagram.json
+            go/analytics_linkedin.json
+            go/analytics_youtube.json
+
+      - name: Push to Dashboard (Instagram)
+        if: ${{ env.DASHBOARD_URL != '' }}
+        working-directory: go
+        run: |
+          curl -sS -X POST "$DASHBOARD_URL/ingest/instagram" \
+            -H "Authorization: Bearer $DASHBOARD_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data-binary @analytics_instagram.json || true
+
+      - name: Push to Dashboard (LinkedIn)
+        if: ${{ env.DASHBOARD_URL != '' }}
+        working-directory: go
+        run: |
+          curl -sS -X POST "$DASHBOARD_URL/ingest/linkedin" \
+            -H "Authorization: Bearer $DASHBOARD_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data-binary @analytics_linkedin.json || true
+      - name: Push to Dashboard (YouTube)
+        if: ${{ env.DASHBOARD_URL != '' && vars.YOUTUBE_VIDEO_ID != '' }}
+        working-directory: go
+        run: |
+          curl -sS -X POST "$DASHBOARD_URL/ingest/youtube" \
+            -H "Authorization: Bearer $DASHBOARD_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data-binary @analytics_youtube.json || true

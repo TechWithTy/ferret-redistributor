@@ -1,0 +1,306 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "YouTubeContentGuidelines",
+    "type": "object",
+    "description": "Reusable schema defining structure, creative direction, and posting standards for YouTube content: Shorts, Long-form Videos, and Community Posts.",
+    "properties": {
+        "meta": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string",
+                    "default": "DealScale.io"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "author": {
+                    "type": "string",
+                    "default": "Ty (CTO)"
+                },
+                "language": {
+                    "type": "string",
+                    "default": "en"
+                },
+                "target_audience": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "Founders",
+                        "Real Estate Agents",
+                        "Investors",
+                        "Startup Builders"
+                    ]
+                }
+            },
+            "required": [
+                "brand"
+            ]
+        },
+        "formats": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "short",
+                            "long_form",
+                            "community_post"
+                        ]
+                    },
+                    "length_recommendations": {
+                        "type": "object",
+                        "properties": {
+                            "min_seconds": {
+                                "type": "integer",
+                                "default": 15
+                            },
+                            "max_seconds": {
+                                "type": "integer",
+                                "default": 900
+                            },
+                            "ideal_range_seconds": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "default": [
+                                    45,
+                                    180
+                                ]
+                            }
+                        }
+                    },
+                    "visual_guidelines": {
+                        "type": "object",
+                        "properties": {
+                            "aspect_ratio": {
+                                "type": "string",
+                                "enum": [
+                                    "9:16",
+                                    "16:9"
+                                ],
+                                "default": "16:9"
+                            },
+                            "resolution": {
+                                "type": "string",
+                                "default": "1920x1080",
+                                "description": "Minimum HD resolution recommended."
+                            },
+                            "thumbnail_style": {
+                                "type": "string",
+                                "default": "High-contrast image, readable text, and expressive face",
+                                "description": "Design guidance for thumbnails."
+                            },
+                            "branding": {
+                                "type": "string",
+                                "default": "Include brand logo bottom-right, DealScale color palette (#002244, #00B3A4, #FF6B35)"
+                            }
+                        }
+                    },
+                    "content_structure": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "Hook (0–3s): grab attention immediately",
+                            "Setup (3–10s): state problem or context",
+                            "Value delivery (10–70s): actionable insights or story",
+                            "CTA (final 5s): engage, subscribe, or link to resource"
+                        ]
+                    },
+                    "caption_guidelines": {
+                        "type": "object",
+                        "properties": {
+                            "max_length": {
+                                "type": "integer",
+                                "default": 5000
+                            },
+                            "include_keywords": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Include search-friendly keywords early in description."
+                            },
+                            "cta_examples": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "Subscribe for weekly automation breakdowns",
+                                    "Comment your biggest growth challenge 👇",
+                                    "Try DealScale free (link in description)"
+                                ]
+                            },
+                            "chapter_timestamps": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Use timestamps for long-form videos for better retention."
+                            }
+                        }
+                    },
+                    "tag_strategy": {
+                        "type": "object",
+                        "properties": {
+                            "recommended_count": {
+                                "type": "integer",
+                                "default": 10
+                            },
+                            "examples": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "real estate automation",
+                                    "AI lead generation",
+                                    "B2B SaaS growth",
+                                    "skip tracing software",
+                                    "DealScale demo"
+                                ]
+                            }
+                        }
+                    },
+                    "posting": {
+                        "type": "object",
+                        "properties": {
+                            "frequency": {
+                                "type": "string",
+                                "enum": [
+                                    "daily",
+                                    "2-3x_week",
+                                    "weekly"
+                                ],
+                                "default": "2-3x_week"
+                            },
+                            "best_times": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "09:00",
+                                    "12:00",
+                                    "18:00"
+                                ]
+                            },
+                            "engagement_window_minutes": {
+                                "type": "integer",
+                                "default": 90,
+                                "description": "Critical time to respond to comments and boost ranking."
+                            }
+                        }
+                    },
+                    "community_post_guidelines": {
+                        "type": "object",
+                        "properties": {
+                            "types": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "poll",
+                                        "image",
+                                        "text",
+                                        "video"
+                                    ]
+                                },
+                                "default": [
+                                    "poll",
+                                    "image",
+                                    "text"
+                                ]
+                            },
+                            "recommended_length": {
+                                "type": "integer",
+                                "default": 300
+                            },
+                            "engagement_prompts": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "Which automation tool saves you most time?",
+                                    "What’s your biggest outbound bottleneck?",
+                                    "Vote below — which feature should we build next?"
+                                ]
+                            }
+                        }
+                    },
+                    "creative_tips": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "Use vertical 9:16 framing for Shorts.",
+                            "Include a visible hook text overlay in first 3 seconds.",
+                            "Edit fast with jump cuts, zooms, and captions.",
+                            "Add end screens with branded CTA.",
+                            "Pin a top comment linking to your product or resource."
+                        ]
+                    },
+                    "example_post": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "example": "How We Automated $2M in Real Estate Deals Using AI 🔥"
+                            },
+                            "description": {
+                                "type": "string",
+                                "example": "In this video, I break down how we scaled lead generation 3x using DealScale’s skip tracing + voice automation. 📊 Subscribe for weekly breakdowns!"
+                            },
+                            "tags": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "AI automation",
+                                    "real estate SaaS",
+                                    "lead generation"
+                                ]
+                            },
+                            "cta": {
+                                "type": "string",
+                                "default": "Subscribe & get the workflow template (link in description)"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "format"
+                ]
+            }
+        },
+        "workflow_checklist": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "default": [
+                "Research trending keyword or topic relevant to ICP",
+                "Write hook, outline story arc, define CTA",
+                "Record main video and B-roll",
+                "Edit for pacing, captions, and clarity",
+                "Create custom thumbnail and end screen",
+                "Upload and optimize title, description, tags",
+                "Post at best-performing time window",
+                "Engage with comments for first 90 mins",
+                "Analyze retention, click-through, and conversion metrics"
+            ]
+        }
+    },
+    "required": [
+        "meta",
+        "formats"
+    ]
+}

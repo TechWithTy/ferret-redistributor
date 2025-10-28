@@ -1,0 +1,280 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "InstagramContentGuidelines",
+    "type": "object",
+    "description": "Standardized schema for Instagram Reels, Stories, and Posts content creation, optimized for brand consistency, engagement, and automation reuse.",
+    "properties": {
+        "meta": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string",
+                    "default": "DealScale.io"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "language": {
+                    "type": "string",
+                    "default": "en"
+                },
+                "author": {
+                    "type": "string",
+                    "default": "Ty (CTO)"
+                }
+            },
+            "required": [
+                "brand"
+            ]
+        },
+        "formats": {
+            "type": "array",
+            "description": "Different Instagram content types with their rules and examples.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "reel",
+                            "story",
+                            "post"
+                        ]
+                    },
+                    "aspect_ratio": {
+                        "type": "string",
+                        "enum": [
+                            "9:16",
+                            "4:5",
+                            "1:1"
+                        ],
+                        "description": "Preferred visual format for the given content type."
+                    },
+                    "length_seconds": {
+                        "type": "integer",
+                        "description": "Recommended maximum length in seconds.",
+                        "examples": [
+                            60,
+                            90,
+                            180
+                        ]
+                    },
+                    "resolution": {
+                        "type": "string",
+                        "default": "1080x1920",
+                        "description": "Recommended video or image resolution."
+                    },
+                    "style": {
+                        "type": "object",
+                        "properties": {
+                            "color_palette": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "pattern": "^#([A-Fa-f0-9]{6})$"
+                                },
+                                "default": [
+                                    "#002244",
+                                    "#00B3A4",
+                                    "#FF6B35"
+                                ]
+                            },
+                            "font_style": {
+                                "type": "string",
+                                "default": "Inter, sans-serif"
+                            },
+                            "branding": {
+                                "type": "string",
+                                "description": "Instructions for brand logo, overlays, or watermark placement.",
+                                "default": "Top-left logo overlay; intro frame with brand animation."
+                            }
+                        },
+                        "required": [
+                            "color_palette"
+                        ]
+                    },
+                    "caption_guidelines": {
+                        "type": "object",
+                        "properties": {
+                            "max_length": {
+                                "type": "integer",
+                                "default": 2200
+                            },
+                            "hook_first_lines": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Ensure the first 1-2 lines are attention-grabbing."
+                            },
+                            "cta_examples": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "Comment 'READY' if you want the template",
+                                    "Save this for later",
+                                    "Tag a teammate who needs this"
+                                ]
+                            },
+                            "tone": {
+                                "type": "string",
+                                "enum": [
+                                    "educational",
+                                    "founder",
+                                    "community",
+                                    "announcement"
+                                ],
+                                "default": "educational"
+                            }
+                        }
+                    },
+                    "hashtags": {
+                        "type": "object",
+                        "properties": {
+                            "recommended_count": {
+                                "type": "integer",
+                                "default": 8
+                            },
+                            "use_location_tags": {
+                                "type": "boolean",
+                                "default": true
+                            },
+                            "mix_strategy": {
+                                "type": "string",
+                                "description": "Mix of high-volume, mid-volume, and niche tags.",
+                                "default": "2 high, 3 mid, 3 niche"
+                            },
+                            "examples": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "#SkipTracing",
+                                    "#RealEstateAutomation",
+                                    "#LeadGeneration",
+                                    "#SaaSForRealEstate",
+                                    "#B2BSaaS",
+                                    "#PropTech"
+                                ]
+                            }
+                        }
+                    },
+                    "creative_tips": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [
+                            "Hook viewers in first 3 seconds.",
+                            "Use readable on-screen text and captions.",
+                            "Change visuals every 2-4 seconds.",
+                            "Show face + emotion for higher retention.",
+                            "Add trending or relevant background audio."
+                        ]
+                    },
+                    "posting": {
+                        "type": "object",
+                        "properties": {
+                            "frequency": {
+                                "type": "string",
+                                "enum": [
+                                    "daily",
+                                    "3-5x_week",
+                                    "2-4x_week"
+                                ],
+                                "default": "3-5x_week"
+                            },
+                            "best_times": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "09:00",
+                                    "11:00",
+                                    "18:00"
+                                ]
+                            },
+                            "engagement_window_minutes": {
+                                "type": "integer",
+                                "default": 60,
+                                "description": "Critical window to reply to comments after posting."
+                            }
+                        }
+                    },
+                    "content_pillars": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "educational",
+                                "behind_the_scenes",
+                                "customer_success",
+                                "trend",
+                                "announcement",
+                                "community"
+                            ]
+                        },
+                        "default": [
+                            "educational",
+                            "behind_the_scenes",
+                            "customer_success"
+                        ]
+                    },
+                    "example_post": {
+                        "type": "object",
+                        "properties": {
+                            "caption": {
+                                "type": "string",
+                                "example": "🎯 Want to double your lead response speed in 5 min? Here's how we use voice-cloned follow-ups at DealScale."
+                            },
+                            "hashtags": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [
+                                    "#VoiceClone",
+                                    "#RealEstateAutomation",
+                                    "#ScaleYourAgency"
+                                ]
+                            },
+                            "cta": {
+                                "type": "string",
+                                "default": "Link in bio to book a demo"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "format",
+                    "aspect_ratio"
+                ]
+            }
+        },
+        "global_workflow": {
+            "type": "array",
+            "description": "Reusable step-by-step checklist for content creation.",
+            "items": {
+                "type": "string"
+            },
+            "default": [
+                "Brainstorm topic & ICP pain point",
+                "Storyboard hook and CTA",
+                "Record or design visuals",
+                "Add captions, text, and trending audio",
+                "Choose cover/thumbnail",
+                "Write caption and select hashtags",
+                "Post at best time window",
+                "Engage for first 60 mins",
+                "Review metrics after 72 hrs"
+            ]
+        }
+    },
+    "required": [
+        "meta",
+        "formats"
+    ]
+}
