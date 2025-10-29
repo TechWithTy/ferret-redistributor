@@ -11,27 +11,31 @@ import (
 
 // MockDataSuite contains all the mock data for testing
 type MockDataSuite struct {
-	Organizations      []models.Organization
-	Users              []models.User
-	Teams              []models.Team
-	TeamMembers        []models.TeamMember
-	SocialAccounts     []models.SocialAccount
-	ContentItems       []models.ContentItem
-	Campaigns          []models.Campaign
-	ScheduledPosts     []models.ScheduledPost
-	AIGenerations      []models.AIGeneration
-	AIVariants         []models.AIVariant
-	Experiments        []models.Experiment
-	ExperimentArms     []models.ExperimentArm
-	PostOutcomes       []models.PostOutcome
-	TrendMetrics       []models.TrendMetric
-	AppMetrics         []models.AppMetric
-	MarketplacePosts   []models.MarketplacePost
-	MarketplaceTxns    []models.MarketplaceTransaction
-	ContentSources     []models.ContentSource
-	ContentSourceItems []models.ContentSourceItem
-	YouTubePlaylists   []models.YouTubePlaylist
-	ContentSyncs       []models.ContentSourceSync
+	Organizations       []models.Organization
+	Users               []models.User
+	Teams               []models.Team
+	TeamMembers         []models.TeamMember
+	SocialAccounts      []models.SocialAccount
+	ContentItems        []models.ContentItem
+	Campaigns           []models.Campaign
+	ScheduledPosts      []models.ScheduledPost
+	AIGenerations       []models.AIGeneration
+	AIVariants          []models.AIVariant
+	Experiments         []models.Experiment
+	ExperimentArms      []models.ExperimentArm
+	PostOutcomes        []models.PostOutcome
+	TrendMetrics        []models.TrendMetric
+	AppMetrics          []models.AppMetric
+	MarketplacePosts    []models.MarketplacePost
+	MarketplaceTxns     []models.MarketplaceTransaction
+	ContentSources      []models.ContentSource
+	ContentSourceItems  []models.ContentSourceItem
+	YouTubePlaylists    []models.YouTubePlaylist
+	ContentSyncs        []models.ContentSourceSync
+	OAuthProviders      []models.OAuthProvider
+	OAuthAccounts       []models.OAuthAccount
+	PhoneVerifications  []models.PhoneVerification
+	SocialAccountLinks  []models.SocialAccountLink
 }
 
 // NewMockDataSuite creates a new instance of MockDataSuite with populated mock data
@@ -45,7 +49,10 @@ func (m *MockDataSuite) generateMockData() {
 	// Generate organizations
 	orgs := GenerateMockOrganizations(3)
 	m.Organizations = orgs
-
+	
+	// Generate OAuth providers
+	m.OAuthProviders = GenerateMockOAuthProviders()
+	
 	// Generate users for each organization
 	for _, org := range orgs {
 		users := GenerateMockUsers(5, org.ID)
@@ -64,10 +71,17 @@ func (m *MockDataSuite) generateMockData() {
 			members := GenerateMockTeamMembers(team.ID, userIDs)
 			m.TeamMembers = append(m.TeamMembers, members...)
 
-			// Generate social accounts for each team
-			teamID := team.ID
-			socialAccounts := GenerateMockSocialAccounts(2, org.ID, &teamID)
+			// Generate social accounts for the organization
+			socialAccounts := GenerateMockSocialAccounts(3, org.ID, nil)
 			m.SocialAccounts = append(m.SocialAccounts, socialAccounts...)
+		
+			// Generate OAuth accounts for users
+			oauthAccounts := GenerateMockOAuthAccounts(users, m.OAuthProviders)
+			m.OAuthAccounts = append(m.OAuthAccounts, oauthAccounts...)
+		
+			// Generate social account links
+			socialAccountLinks := GenerateMockSocialAccountLinks(users)
+			m.SocialAccountLinks = append(m.SocialAccountLinks, socialAccountLinks...)
 		}
 
 		// Generate content items
@@ -132,7 +146,10 @@ func (m *MockDataSuite) generateMockData() {
 		m.TrendMetrics = append(m.TrendMetrics, GenerateMockTrendMetrics(org.ID, 10)...)
 
 		// Generate app metrics
-		m.AppMetrics = append(m.AppMetrics, GenerateMockAppMetrics(5)...)
+		m.AppMetrics = GenerateMockAppMetrics(20)
+	
+		// Generate phone verifications
+		m.PhoneVerifications = GenerateMockPhoneVerifications(10)
 
 		// Generate marketplace posts and transactions
 		for i := 0; i < 3; i++ {
