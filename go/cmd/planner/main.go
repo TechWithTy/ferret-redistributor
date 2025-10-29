@@ -11,7 +11,7 @@ import (
     _ "github.com/lib/pq"
 
     "github.com/bitesinbyte/ferret/pkg/adapters/calendarrepo"
-    "github.com/bitesinbyte/ferret/pkg/generator"
+    generator "github.com/bitesinbyte/ferret/pkg/engine/generator"
 )
 
 func main() {

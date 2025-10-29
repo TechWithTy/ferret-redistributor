@@ -1,0 +1,54 @@
+{
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Extract"
+          }
+        ]
+      ]
+    },
+    "Extract": {
+      "main": [
+        [
+          {
+            "node": "Transform"
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Load"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "Analytics Pipeline",
+  "nodes": [
+    {
+      "id": "Cron_1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.webhook"
+    },
+    {
+      "id": "Extract_2",
+      "name": "Extract",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "id": "Transform_3",
+      "name": "Transform",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "id": "Load_4",
+      "name": "Load",
+      "type": "n8n-nodes-base.httpRequest"
+    }
+  ]
+}

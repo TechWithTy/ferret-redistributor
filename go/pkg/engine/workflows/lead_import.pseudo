@@ -1,0 +1,9 @@
+workflow "Lead Import" version 1.0:
+  trigger "Webhook" at "/new-lead"
+  action "Transform Lead" using "workers/ai_worker"
+  action "Push to CRM" using "queue/nats_engine"
+  on_error "Notify" using "telemetry/sentry_engine"
+  connect "Webhook" -> "Transform Lead"
+  connect "Transform Lead" -> "Push to CRM"
+  connect "Push to CRM" -> "Notify"
+

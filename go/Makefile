@@ -62,3 +62,22 @@ docs-copy-openapi:
 	@mkdir -p docs/recurpost docs/postiz
 	cp pkg/api/recurpost/openapi_new.yaml docs/recurpost/openapi.yaml
 	cp pkg/api/postiz/openapi.yaml docs/postiz/openapi.yaml
+
+# --- EOWR (Engine-Oriented Workflow Runtime) ---
+.PHONY: eowr-compile eowr-export eowr-compile-all eowr-export-all eowr-bootstrap
+
+eowr-compile:
+	@echo "Usage: make eowr-compile IN=pkg/engine/workflows/lead_import.pseudo OUT=pkg/engine/workflows/compiled/lead_import.go" && \
+	[ -n "$$IN" ] && [ -n "$$OUT" ] && go run ./cmd/eowr compile "$$IN" "$$OUT"
+
+eowr-export:
+	@echo "Usage: make eowr-export IN=pkg/engine/workflows/lead_import.pseudo OUT=pkg/engine/workflows/exports/lead_import.json" && \
+	[ -n "$$IN" ] && [ -n "$$OUT" ] && go run ./cmd/eowr export "$$IN" "$$OUT"
+
+eowr-compile-all:
+	go run ./cmd/eowr compile-all
+
+eowr-export-all:
+	go run ./cmd/eowr export-all
+
+eowr-bootstrap: eowr-compile-all eowr-export-all

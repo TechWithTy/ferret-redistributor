@@ -1,7 +1,6 @@
 //go:build otel
 // +build otel
 
-package telemetry
 
 import (
     "context"

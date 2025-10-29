@@ -5,7 +5,7 @@ import (
     "strings"
 
     ig "github.com/bitesinbyte/ferret/pkg/external/instagram"
-    "github.com/bitesinbyte/ferret/pkg/generator"
+    generator "github.com/bitesinbyte/ferret/pkg/engine/generator"
 )
 
 type TriggerMatcher struct {

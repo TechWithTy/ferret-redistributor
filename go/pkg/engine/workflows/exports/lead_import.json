@@ -1,0 +1,54 @@
+{
+  "connections": {
+    "Push to CRM": {
+      "main": [
+        [
+          {
+            "node": "Notify"
+          }
+        ]
+      ]
+    },
+    "Transform Lead": {
+      "main": [
+        [
+          {
+            "node": "Push to CRM"
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Transform Lead"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "Lead Import",
+  "nodes": [
+    {
+      "id": "Webhook_1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook"
+    },
+    {
+      "id": "Transform_Lead_2",
+      "name": "Transform Lead",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "id": "Push_to_CRM_3",
+      "name": "Push to CRM",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "id": "Notify_4",
+      "name": "Notify",
+      "type": "n8n-nodes-base.code"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+workflow "CRM Sync" version 1.0:
+  trigger "Schedule"
+  action "Pull Updates" using "workers/data_worker"
+  action "Push to CRM" using "workers/crm_worker"
+  connect "Schedule" -> "Pull Updates"
+  connect "Pull Updates" -> "Push to CRM"
+

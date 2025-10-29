@@ -1,0 +1,9 @@
+workflow "Analytics Pipeline" version 1.0:
+  trigger "Cron"
+  action "Extract" using "workers/data_worker"
+  action "Transform" using "workers/data_worker"
+  action "Load" using "queue/pulsar_engine"
+  connect "Cron" -> "Extract"
+  connect "Extract" -> "Transform"
+  connect "Transform" -> "Load"
+
