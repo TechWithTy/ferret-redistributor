@@ -18,16 +18,19 @@ type Client struct {
 	userAgent string
 
 	// Services
-	Auth      *AuthService
-	Accounts  *AccountsService
-	Posts     *PostsService
-	Schedules *SchedulesService
-	Media     *MediaService
-    Analytics *AnalyticsService
-    UserLogin *UserLoginService
-    SocialConnect *SocialConnectService
-    SocialAccounts *SocialAccountsService
-    Libraries *LibrariesService
+	Auth           *AuthService
+	Accounts       *AccountsService
+	Posts          *PostsService
+	Schedules      *SchedulesService
+	Media          *MediaService
+	Analytics      *AnalyticsService
+	UserLogin      *UserLoginService
+	SocialConnect  *SocialConnectService
+	SocialAccounts *SocialAccountsService
+	Libraries      *LibrariesService
+	History        *HistoryService
+	Publishing     *PublishingService
+	AI             *AIService
 }
 
 type Option func(*Client)
@@ -52,12 +55,15 @@ func NewClient(opts ...Option) *Client {
 	c.Posts = &PostsService{c}
 	c.Schedules = &SchedulesService{c}
 	c.Media = &MediaService{c}
-    c.Analytics = &AnalyticsService{c}
-    c.UserLogin = &UserLoginService{c}
-    c.SocialConnect = &SocialConnectService{c}
-    c.SocialAccounts = &SocialAccountsService{c}
-    c.Libraries = &LibrariesService{c}
-    return c
+	c.Analytics = &AnalyticsService{c}
+	c.UserLogin = &UserLoginService{c}
+	c.SocialConnect = &SocialConnectService{c}
+	c.SocialAccounts = &SocialAccountsService{c}
+	c.Libraries = &LibrariesService{c}
+	c.History = &HistoryService{c}
+	c.Publishing = &PublishingService{c}
+	c.AI = &AIService{c}
+	return c
 }
 
 func (c *Client) newRequest(ctx context.Context, method, p string, body io.Reader) (*http.Request, error) {

@@ -36,49 +36,66 @@ type PostList struct {
 
 // Media
 type Media struct {
-    ID       string `json:"id"`
-    URL      string `json:"url"`
-    MimeType string `json:"mime_type"`
-    Width    int    `json:"width,omitempty"`
-    Height   int    `json:"height,omitempty"`
+	ID       string `json:"id"`
+	URL      string `json:"url"`
+	MimeType string `json:"mime_type"`
+	Width    int    `json:"width,omitempty"`
+	Height   int    `json:"height,omitempty"`
 }
 
 // User login
 type UserLoginResponse struct {
-    Success     bool   `json:"success"`
-    Message     string `json:"message,omitempty"`
-    AccessToken string `json:"access_token,omitempty"`
+	Success     bool   `json:"success"`
+	Message     string `json:"message,omitempty"`
+	AccessToken string `json:"access_token,omitempty"`
 }
 
 // Connect Social Account URLs
 type ConnectURLsResponse struct {
-    URLs map[string]string `json:"urls"`
+	URLs map[string]string `json:"urls"`
 }
 
 // Social account list
 type SocialAccountListResponse struct {
-    Accounts []Account `json:"accounts"`
+	Accounts []Account `json:"accounts"`
 }
 
 // Library list
 type Library struct {
-    ID          string `json:"id"`
-    Name        string `json:"name"`
-    Description string `json:"description,omitempty"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
 }
 
 type LibraryListResponse struct {
-    Libraries []Library `json:"libraries"`
+	Libraries []Library `json:"libraries"`
 }
 
 // History data (generic map to allow unknown shape)
 type HistoryDataResponse struct {
-    Data map[string]any `json:"data"`
+	Data map[string]any `json:"data"`
 }
 
 // Add content in library
 type AddContentInLibraryResponse struct {
-    Success   bool   `json:"success"`
-    Message   string `json:"message,omitempty"`
-    ContentID string `json:"content_id,omitempty"`
+	Success   bool   `json:"success"`
+	Message   string `json:"message,omitempty"`
+	ContentID string `json:"content_id,omitempty"`
+}
+
+// Post content response
+type PostContentResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	PostID  string `json:"post_id,omitempty"`
+}
+
+// AI generate content response (generic)
+type GenerateContentResponse struct {
+	Data map[string]any `json:"data"`
+}
+
+// AI generate image response (generic)
+type GenerateImageResponse struct {
+	Data map[string]any `json:"data"`
 }

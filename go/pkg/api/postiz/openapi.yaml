@@ -1,0 +1,298 @@
+openapi: 3.0.3
+info:
+  title: Postiz Public API
+  version: 1.0.0
+  description: |
+    Public API allows you to work with Postiz in headless mode.
+    - Auth: header `Authorization: {apiKey}`
+    - Base URL (hosted): https://api.postiz.com/public/v1
+    - Rate limit: 30 requests/hour
+servers:
+  - url: https://api.postiz.com/public/v1
+paths:
+  /integrations:
+    get:
+      summary: Get all added channels (integrations)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Integration'
+  /find-slot/{id}:
+    get:
+      summary: Get next available slot for a channel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindSlotResponse'
+  /upload:
+    post:
+      summary: Upload a new file (multipart)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+  /upload-from-url:
+    post:
+      summary: Upload a new file from URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url: { type: string }
+              required: [url]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+  /posts:
+    get:
+      summary: List posts
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema: { type: string }
+        - in: query
+          name: endDate
+          required: true
+          schema: { type: string }
+        - in: query
+          name: customer
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsListResponse'
+    post:
+      summary: Create/Update posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdatePostRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateUpdateResult'
+  /posts/{id}:
+    delete:
+      summary: Delete a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletePostResponse'
+  /generate-video:
+    post:
+      summary: Generate videos with AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateVideoRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeneratedVideo'
+  /video/function:
+    post:
+      summary: Video helper function (e.g., loadVoices)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VideoFunctionRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoFunctionResponse'
+
+components:
+  schemas:
+    Integration:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        identifier: { type: string }
+        picture: { type: string }
+        disabled: { type: boolean }
+        profile: { type: string }
+        customer:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+    FindSlotResponse:
+      type: object
+      properties:
+        date: { type: string }
+    UploadResponse:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        path: { type: string }
+        organizationId: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+    PostsListResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+    Post:
+      type: object
+      properties:
+        id: { type: string }
+        content: { type: string }
+        publishDate: { type: string }
+        releaseURL: { type: string }
+        state: { type: string, enum: [QUEUE, PUBLISHED, ERROR, DRAFT] }
+        integration:
+          type: object
+          properties:
+            id: { type: string }
+            providerIdentifier: { type: string }
+            name: { type: string }
+            picture: { type: string }
+    CreateUpdatePostRequest:
+      type: object
+      properties:
+        type: { type: string, enum: [draft, schedule, now] }
+        date: { type: string }
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostInput'
+      required: [type]
+    PostInput:
+      type: object
+      properties:
+        integration:
+          type: object
+          properties:
+            id: { type: string }
+          required: [id]
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostContent'
+        group: { type: string }
+        settings:
+          type: object
+          additionalProperties: true
+      required: [integration, value]
+    PostContent:
+      type: object
+      properties:
+        content: { type: string }
+        id: { type: string }
+        image:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaDto'
+      required: [content]
+    MediaDto:
+      type: object
+      properties:
+        id: { type: string }
+        path: { type: string }
+    CreateUpdateResult:
+      type: object
+      properties:
+        postId: { type: string }
+        integration: { type: string }
+    DeletePostResponse:
+      type: object
+      properties:
+        id: { type: string }
+    GenerateVideoRequest:
+      type: object
+      properties:
+        type: { type: string, enum: [image-text-slides, veo3] }
+        output: { type: string, enum: [vertical, horizontal] }
+        customParams:
+          type: object
+          additionalProperties: true
+    GeneratedVideo:
+      type: object
+      properties:
+        id: { type: string }
+        path: { type: string }
+    VideoFunctionRequest:
+      type: object
+      properties:
+        functionName: { type: string }
+        identifier: { type: string }
+    VideoFunctionResponse:
+      type: object
+      properties:
+        voices:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              name: { type: string }

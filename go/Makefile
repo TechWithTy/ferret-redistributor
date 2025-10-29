@@ -41,3 +41,24 @@ build-all:
 .PHONY: run-api
 run-api:
 	API_PORT=$${API_PORT:-8080} go run ./cmd/api
+
+.PHONY: codegen-recurpost codegen-postiz openapi-validate
+codegen-recurpost:
+	@command -v oapi-codegen >/dev/null 2>&1 || { echo "oapi-codegen not installed. See docs/recurpost/CODEGEN.md"; exit 1; }
+	oapi-codegen -generate types,client -package recurpost -o pkg/api/recurpost/generated_oapi.go pkg/api/recurpost/openapi_new.yaml
+
+codegen-postiz:
+	@command -v oapi-codegen >/dev/null 2>&1 || { echo "oapi-codegen not installed. See docs/postiz/CODEGEN.md"; exit 1; }
+	oapi-codegen -generate types,client -package postiz -o pkg/api/postiz/generated_oapi.go pkg/api/postiz/openapi.yaml
+
+# Validate OpenAPI files (requires Redocly CLI: npm i -g @redocly/cli)
+openapi-validate:
+	@command -v redocly >/dev/null 2>&1 || { echo "redocly not installed. npm i -g @redocly/cli"; exit 1; }
+	redocly lint pkg/api/recurpost/openapi_new.yaml
+	redocly lint pkg/api/postiz/openapi.yaml
+
+.PHONY: docs-copy-openapi
+docs-copy-openapi:
+	@mkdir -p docs/recurpost docs/postiz
+	cp pkg/api/recurpost/openapi_new.yaml docs/recurpost/openapi.yaml
+	cp pkg/api/postiz/openapi.yaml docs/postiz/openapi.yaml

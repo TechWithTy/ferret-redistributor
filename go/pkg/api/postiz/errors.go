@@ -1,4 +1,4 @@
-package recurpost
+package postiz
 
 import (
 	"errors"
@@ -6,16 +6,7 @@ import (
 	"net/http"
 )
 
-var (
-	// ErrNotImplemented indicates a scaffold method needs implementation.
-	ErrNotImplemented   = errors.New("not implemented")
-	ErrUnauthorized     = errors.New("unauthorized")
-	ErrValidation       = errors.New("validation error")
-	ErrMethodNotAllowed = errors.New("method not allowed")
-	ErrRateLimited      = errors.New("rate limited")
-)
-
-// APIError represents an HTTP error returned by the remote API.
+// APIError wraps HTTP error details from Postiz
 type APIError struct {
 	StatusCode int
 	Code       string

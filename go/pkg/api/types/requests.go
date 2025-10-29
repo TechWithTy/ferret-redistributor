@@ -28,10 +28,10 @@ type CreateContentRequest struct {
 
 // UpdateContentRequest represents the request to update content
 type UpdateContentRequest struct {
-	Title       string                 `json:"title"`
-	Content     string                 `json:"content"`
-	Status      string                 `json:"status"`
-	Metadata    map[string]interface{} `json:"metadata"`
+	Title    string                 `json:"title"`
+	Content  string                 `json:"content"`
+	Status   string                 `json:"status"`
+	Metadata map[string]interface{} `json:"metadata"`
 }
 
 // PublishContentRequest represents the request to publish content
@@ -57,8 +57,8 @@ type CancelSubscriptionRequest struct {
 
 // CreateTeamRequest represents the request to create a team
 type CreateTeamRequest struct {
-	Name        string   `json:"name" validate:"required"`
-	Description string   `json:"description"`
+	Name         string   `json:"name" validate:"required"`
+	Description  string   `json:"description"`
 	MemberEmails []string `json:"member_emails"`
 }
 

@@ -1,0 +1,23 @@
+name: OpenAPI Lint
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  lint-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Redocly CLI
+        run: npm i -g @redocly/cli
+      - name: Lint RecurPost OpenAPI
+        run: redocly lint pkg/api/recurpost/openapi_new.yaml
+      - name: Lint Postiz OpenAPI
+        run: redocly lint pkg/api/postiz/openapi.yaml

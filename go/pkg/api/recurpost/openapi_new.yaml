@@ -1,0 +1,362 @@
+openapi: 3.0.0
+info:
+  title: RecurPost API
+  version: 1.0.0
+  description: >
+    Official RecurPost API reference (compiled version).  
+    All endpoints require `emailid` and `pass_key` parameters.  
+    Standard responses include:  
+    - 200: Success  
+    - 400: Validation Error  
+    - 401: Login Credential Error  
+    - 405: Method Not Found  
+    - 415: Schedule Time Error (for /post_content only)
+
+servers:
+  - url: https://api.recurpost.com
+    description: Default API Server
+
+paths:
+  /api/user_login:
+    post:
+      summary: Login to RecurPost
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+          required: true
+        - name: pass_key
+          in: query
+          schema: { type: string }
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/connect_social_account_urls:
+    post:
+      summary: Connect Social Account URLs
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/social_account_list:
+    post:
+      summary: Get Social Account List
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/library_list:
+    post:
+      summary: Get Library List
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/history_data:
+    post:
+      summary: Retrieve Posting History
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+        - name: id
+          in: query
+          schema: { type: string }
+        - name: is_get_video_updates
+          in: query
+          schema: 
+            type: string
+            enum: [true, false]
+            default: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+                id: { type: string }
+                is_get_video_updates: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/add_content_in_library:
+    post:
+      summary: Add Post in Library
+      description: Add a post to a specific RecurPost library with per-platform custom messages and metadata.
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+        - name: id
+          in: query
+          description: Library ID
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContentRequest"
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/post_content:
+    post:
+      summary: Post Content on Social Account
+      description: Publish content directly to linked social accounts or schedule posts.
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+        - name: id
+          in: query
+          description: Social Account ID
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ContentRequest"
+                - type: object
+                  properties:
+                    schedule_date_time:
+                      type: string
+                      description: Posting time in `YYYY-MM-DD HH:mm:ss` format
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+        "415": { description: Schedule Time Error }
+
+  /api/generate_content_with_ai:
+    post:
+      summary: Generate Content with AI
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+        - name: prompt_text
+          in: query
+          schema: { type: string }
+        - name: ai_id
+          in: query
+          schema: { type: string }
+        - name: chat_progress
+          in: query
+          schema: { type: string }
+        - name: chat_history
+          in: query
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+                prompt_text: { type: string }
+                ai_id: { type: string }
+                chat_progress: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+  /api/generate_image_with_ai:
+    post:
+      summary: Generate Image with AI
+      parameters:
+        - name: emailid
+          in: query
+          schema: { type: string }
+        - name: pass_key
+          in: query
+          schema: { type: string }
+        - name: prompt_text
+          in: query
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+                prompt_text: { type: string }
+      responses:
+        "200": { description: Success }
+        "400": { description: Validation Error }
+        "401": { description: Login Credential Error }
+        "405": { description: Method Not Found }
+
+components:
+  schemas:
+    ContentRequest:
+      type: object
+      properties:
+        emailid: { type: string }
+        pass_key: { type: string }
+        id: { type: string }
+        message: { type: string }
+        fb_message: { type: string }
+        tw_message: { type: string }
+        ln_message: { type: string }
+        in_message: { type: string }
+        gmb_message: { type: string }
+        pi_message: { type: string }
+        yt_message: { type: string }
+        tk_message: { type: string }
+        th_message: { type: string }
+        bs_message: { type: string }
+        url: { type: string }
+        image_url: { type: array, items: { type: string } }
+        video_url: { type: string }
+        fb_post_type: { type: string, enum: [feed, story, reel], default: feed }
+        in_post_type: { type: string, enum: [feed, story, reel], default: feed }
+        in_reel_share_in_feed: { type: string, enum: [yes, no], default: yes }
+        first_comment: { type: string }
+        fb_first_comment: { type: string }
+        ln_first_comment: { type: string }
+        in_first_comment: { type: string }
+        ln_document: { type: string }
+        ln_document_title: { type: string }
+        pi_title: { type: string }
+        gbp_cta:
+          type: string
+          enum: [None, Learn more, Sign up, Buy, Order online, Book, Call now, Offer]
+          default: None
+        gbp_cta_url: { type: string }
+        gbp_offer_title: { type: string }
+        gbp_offer_start_date: { type: string }
+        gbp_offer_end_date: { type: string }
+        gbp_offer_coupon_code: { type: string }
+        gbp_offer_terms: { type: string }
+        gbp_redeem_offer_link: { type: string }
+        yt_title: { type: string }
+        yt_category:
+          type: string
+          default: Entertainment
+          enum: [Film & Animation, Autos & Vehicles, Music, Pets & Animals, Sports, Travel & Events, Gaming, People & Blogs, Comedy, Entertainment, News & Politics, Howto & Style, Education, Science & Technology, Nonprofits & Activism]
+        yt_privacy_status:
+          type: string
+          default: Public
+          enum: [Public, Private, Unlisted]
+        yt_user_tags: { type: string }
+        yt_thumb: { type: string }
+        yt_video_made_for_kids:
+          type: string
+          default: yes
+          enum: [yes, no]
+        tk_privacy_status:
+          type: string
+          default: "Public to Everyone"
+          enum: ["Public to Everyone", "Mutual Follow Friends", "Self Only"]
+        tk_allow_comments:
+          type: string
+          default: yes
+          enum: [yes, no]
+        tk_allow_duet:
+          type: string
+          default: yes
+          enum: [yes, no]
+        tk_allow_stitches:
+          type: string
+          default: yes
+          enum: [yes, no]
+        is_top_of_queue: { type: integer, enum: [0, 1], default: 0 }
+        host_images_on_recurpost:
+          type: string
+          enum: [true, false]
+          default: true
+        content_livedate: { type: string }
+        content_expiredate: { type: string }

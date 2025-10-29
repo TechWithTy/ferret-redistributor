@@ -1,0 +1,42 @@
+name: Publish API Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Copy OpenAPI files into docs
+        run: |
+          mkdir -p docs/recurpost docs/postiz
+          cp pkg/api/recurpost/openapi_new.yaml docs/recurpost/openapi.yaml
+          cp pkg/api/postiz/openapi.yaml docs/postiz/openapi.yaml
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
