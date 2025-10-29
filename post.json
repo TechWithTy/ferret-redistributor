@@ -1,0 +1,15 @@
+{
+    "author": "urn:li:organization:107556463",
+    "lifecycleState": "PUBLISHED",
+    "specificContent": {
+        "com.linkedin.ugc.ShareContent": {
+            "shareCommentary": {
+                "text": "🚀 DealScale.io automation update — scale smarter with AI-powered follow-ups and CRM sync."
+            },
+            "shareMediaCategory": "NONE"
+        }
+    },
+    "visibility": {
+        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+    }
+}

@@ -40,3 +40,6 @@
 [submodule "python/igify"]
 	path = python/igify
 	url = https://github.com/TechWithTy/IGIfy-Remastered.git
+[submodule "go/pkg/mcp-go"]
+	path = go/pkg/mcp-go
+	url = https://github.com/Deal-Scale/mcp-go.git

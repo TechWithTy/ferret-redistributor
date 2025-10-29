@@ -73,6 +73,9 @@ func TestRealRSSFeed(t *testing.T) {
 		t.Fatalf("Failed to parse RSS feed: %v\nResponse: %s", err, string(body)[:500])
 	}
 
+	// Normalize for trimmed fields, canonical URLs, and parsed times
+	feed.Channel.Normalize()
+
 	// Print the parsed RSS structure
 	t.Logf("\n=== PARSED RSS STRUCTURE ===")
 	t.Logf("Channel Title: %s", feed.Channel.Title)
@@ -80,6 +83,15 @@ func TestRealRSSFeed(t *testing.T) {
 	t.Logf("Channel Link: %s", channelLink)
 	t.Logf("Channel Description: %s", feed.Channel.Description)
 	t.Logf("Last Build Date: %s", feed.Channel.LastBuildDate)
+	if !feed.Channel.PubDateTime.IsZero() {
+		t.Logf("Parsed PubDate: %s", feed.Channel.PubDateTime.Format(time.RFC3339))
+	}
+	if !feed.Channel.PublishedTime.IsZero() {
+		t.Logf("Parsed Atom Published: %s", feed.Channel.PublishedTime.Format(time.RFC3339))
+	}
+	if !feed.Channel.UpdatedTime.IsZero() {
+		t.Logf("Parsed Atom Updated: %s", feed.Channel.UpdatedTime.Format(time.RFC3339))
+	}
 	t.Logf("Generator: %s", feed.Channel.Generator)
 	if feed.Channel.AtomLink.Href != "" {
 		t.Logf("Atom Link: %s (rel: %s)", feed.Channel.AtomLink.Href, feed.Channel.AtomLink.Rel)
@@ -97,14 +109,27 @@ func TestRealRSSFeed(t *testing.T) {
 		t.Logf("\n=== Item %d ===", i+1)
 		t.Logf("Title: %s", strings.TrimSpace(item.Title))
 		t.Logf("Link: %s", item.Link)
-		
+
 		// Clean and truncate description
 		desc := strings.TrimSpace(item.Description)
 		if len(desc) > 150 {
 			desc = fmt.Sprintf("%.150s...", desc)
 		}
 		t.Logf("Description: %s", desc)
-		
+
+		// Indicate presence of content:encoded without dumping full HTML
+		content := strings.TrimSpace(item.Content)
+		if content != "" {
+			snippet := content
+			if len(snippet) > 120 {
+				snippet = snippet[:120] + "..."
+			}
+			// Keep concise: show only length and a short snippet
+			t.Logf("Content: [present] (%d chars) %s", len(content), snippet)
+		} else {
+			t.Logf("Content: [absent]")
+		}
+
 		t.Logf("Published: %s", item.PubDate)
 		if item.Creator != "" {
 			t.Logf("Author: %s", item.Creator)
@@ -118,6 +143,18 @@ func TestRealRSSFeed(t *testing.T) {
 				item.Enclosure.Type, 
 				item.Enclosure.Length)
 		}
+	}
+
+	// Ensure at least one item contains content:encoded without verbose output
+	foundContent := false
+	for _, it := range feed.Channel.Items {
+		if strings.TrimSpace(it.Content) != "" {
+			foundContent = true
+			break
+		}
+	}
+	if !foundContent {
+		t.Log("No content:encoded fields found in items")
 	}
 
 	// Basic validation
