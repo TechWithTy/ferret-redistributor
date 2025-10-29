@@ -23,3 +23,107 @@ go.work
 
 .ds_store
 .bin
+# -------------------------------
+# 🔒 Sensitive & Environment Files
+# -------------------------------
+
+# Root-level environment configs
+.env
+.env.*
+.envrc
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Secrets, credentials & API keys
+*.key
+*.pem
+*.crt
+*.cert
+*.pfx
+*.p12
+*.keystore
+*.jks
+*.secret
+*.secrets.json
+*.config.json
+*.credentials.json
+credentials.json
+secrets.json
+
+# Terraform & Infrastructure
+*.tfstate
+*.tfstate.backup
+terraform.tfvars
+
+# Package / Service credentials
+*.npmrc
+*.pypirc
+*.netrc
+
+# Cloud service configs
+.aws/
+.gcp/
+.azure/
+.terraform/
+# -------------------------------
+# 🔒 Sensitive & Environment Files
+# -------------------------------
+
+# Root-level environment configs
+.env
+.env.*
+.envrc
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Secrets, credentials & API keys
+*.key
+*.pem
+*.crt
+*.cert
+*.pfx
+*.p12
+*.keystore
+*.jks
+*.secret
+*.secrets.json
+*.config.json
+*.credentials.json
+credentials.json
+secrets.json
+
+# Terraform & Infrastructure
+*.tfstate
+*.tfstate.backup
+terraform.tfvars
+
+# Package / Service credentials
+*.npmrc
+*.pypirc
+*.netrc
+
+# Cloud service configs
+.aws/
+.gcp/
+.azure/
+.terraform/
