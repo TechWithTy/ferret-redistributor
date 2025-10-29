@@ -1,0 +1,522 @@
+openapi: 3.0.3
+info:
+  title: RecurPost API
+  version: 1.0.0
+servers:
+  - url: https://api.recurpost.example
+paths:
+  /api/user_login:
+    post:
+      summary: Login to RecurPost
+      parameters:
+        - in: query
+          name: emailid
+          required: false
+          schema:
+            type: string
+          description: Email address used to login (optional if provided in body)
+        - in: query
+          name: pass_key
+          required: false
+          schema:
+            type: string
+          description: Password key from account settings (optional if provided in body)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+              required: [emailid, pass_key]
+      responses:
+        '200':
+          description: Login response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Login Credential Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/connect_social_account_urls:
+    post:
+      summary: Connect Social account URLs
+      parameters:
+        - in: query
+          name: emailid
+          required: false
+          schema:
+            type: string
+          description: Email id of user (optional if provided in body)
+        - in: query
+          name: pass_key
+          required: false
+          schema:
+            type: string
+          description: Password Key of user (from account settings) (optional if provided in body)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+              required: [emailid, pass_key]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectURLsResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Login Credential Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/social_account_list:
+    post:
+      summary: Social account list
+      parameters:
+        - in: query
+          name: emailid
+          required: true
+          schema:
+            type: string
+          description: Email id of user
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccountListResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/library_list:
+    post:
+      summary: Library list
+      parameters:
+        - in: query
+          name: emailid
+          required: false
+          schema:
+            type: string
+          description: Email id of user (optional if provided in body)
+        - in: query
+          name: pass_key
+          required: false
+          schema:
+            type: string
+          description: Password Key of user (from account settings) (optional if provided in body)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+              required: [emailid, pass_key]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryListResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/history_data:
+    post:
+      summary: History data
+      parameters:
+        - in: query
+          name: emailid
+          required: false
+          schema: { type: string }
+          description: Email id of user (optional if provided in body)
+        - in: query
+          name: pass_key
+          required: false
+          schema: { type: string }
+          description: Password Key of user (optional if provided in body)
+        - in: query
+          name: id
+          required: false
+          schema: { type: string }
+          description: social account id
+        - in: query
+          name: is_get_video_updates
+          required: false
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "true"
+          description: Get video posts (true/false)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+                id: { type: string }
+                is_get_video_updates:
+                  type: string
+                  enum: ["true", "false"]
+                  default: "true"
+              required: [emailid, pass_key]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryDataResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Login Credential Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/add_content_in_library:
+    post:
+      summary: Add post in library
+      parameters:
+        - in: query
+          name: emailid
+          required: false
+          schema: { type: string }
+          description: Email id of user (optional if provided in body)
+        - in: query
+          name: pass_key
+          required: false
+          schema: { type: string }
+          description: Password Key of user (optional if provided in body)
+        - in: query
+          name: id
+          required: false
+          schema: { type: string }
+          description: library id
+        - in: query
+          name: message
+          required: false
+          schema: { type: string }
+          description: Message/Content for post
+        - in: query
+          name: fb_message
+          required: false
+          schema: { type: string }
+          description: Custom Facebook message
+        - in: query
+          name: tw_message
+          required: false
+          schema: { type: string }
+          description: Custom X (Twitter) message
+        - in: query
+          name: ln_message
+          required: false
+          schema: { type: string }
+          description: Custom LinkedIn message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid: { type: string }
+                pass_key: { type: string }
+                id: { type: string }
+                message: { type: string }
+                fb_message: { type: string }
+                tw_message: { type: string }
+                ln_message: { type: string }
+              required: [emailid, pass_key, id, message]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddContentInLibraryResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Login Credential Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Login Credential Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Login Credential Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /oauth/token:
+    post:
+      summary: Exchange credentials for access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthTokenRequest'
+      responses:
+        '200':
+          description: Token response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+  /accounts:
+    get:
+      summary: List connected accounts/profiles
+      responses:
+        '200':
+          description: Accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+  /posts:
+    get:
+      summary: List posts
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, minimum: 1, maximum: 200 }
+      responses:
+        '200':
+          description: Posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostList'
+    post:
+      summary: Create a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /posts/{id}:
+    get:
+      summary: Get post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    delete:
+      summary: Delete post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Deleted }
+
+components:
+  schemas:
+    UserLoginResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        access_token: { type: string, nullable: true }
+    ConnectURLsResponse:
+      type: object
+      properties:
+        urls:
+          type: object
+          additionalProperties:
+            type: string
+    SocialAccountListResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items: { $ref: '#/components/schemas/Account' }
+    Library:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+    LibraryListResponse:
+      type: object
+      properties:
+        libraries:
+          type: array
+          items: { $ref: '#/components/schemas/Library' }
+    HistoryDataResponse:
+      type: object
+      additionalProperties: true
+    AddContentInLibraryResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        content_id: { type: string }
+    Error:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+    AuthTokenRequest:
+      type: object
+      properties:
+        grant_type: { type: string, enum: [password, refresh_token] }
+        username: { type: string }
+        password: { type: string }
+        refresh_token: { type: string }
+      required: [grant_type]
+    AuthTokenResponse:
+      type: object
+      properties:
+        access_token: { type: string }
+        token_type: { type: string }
+        expires_in: { type: integer }
+        refresh_token: { type: string }
+    Account:
+      type: object
+      properties:
+        id: { type: string }
+        provider: { type: string }
+        handle: { type: string }
+        display_name: { type: string }
+    Post:
+      type: object
+      properties:
+        id: { type: string }
+        text: { type: string }
+        media_ids:
+          type: array
+          items: { type: string }
+        scheduled_at: { type: string, format: date-time }
+        status: { type: string, enum: [draft, scheduled, published, failed] }
+    PostList:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/Post' }
+        next_page: { type: integer, nullable: true }
+    CreatePostRequest:
+      type: object
+      properties:
+        text: { type: string }
+        media_ids:
+          type: array
+          items: { type: string }
+        scheduled_at: { type: string, format: date-time, nullable: true }
+      required: [text]
