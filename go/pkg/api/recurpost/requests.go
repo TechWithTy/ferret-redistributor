@@ -58,7 +58,8 @@ type ConnectSocialAccountURLsRequest struct {
 
 // Social account list
 type SocialAccountListRequest struct {
-	EmailID string `json:"emailid"`
+    EmailID string `json:"emailid"`
+    PassKey string `json:"pass_key"`
 }
 
 // Library list

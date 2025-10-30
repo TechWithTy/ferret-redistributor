@@ -3,7 +3,7 @@ package main
 import (
     "fmt"
     "log"
-    "github.com/bitesinbyte/ferret/pkg/auth"
+    "github.com/bitesinbyte/ferret/pkg/engine/auth"
 )
 
 // Small CLI demo to generate a session token and hash/verify it.

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitesinbyte/ferret/pkg/auth"
+	"github.com/bitesinbyte/ferret/pkg/engine/auth"
 	"github.com/gin-gonic/gin"
 	"os"
 )

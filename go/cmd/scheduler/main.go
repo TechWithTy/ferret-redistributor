@@ -13,9 +13,9 @@ import (
     _ "github.com/lib/pq"
 
     "github.com/bitesinbyte/ferret/pkg/calendar"
-    "github.com/bitesinbyte/ferret/pkg/metrics"
-    "github.com/bitesinbyte/ferret/pkg/telemetry"
-    "github.com/bitesinbyte/ferret/pkg/queue"
+    "github.com/bitesinbyte/ferret/pkg/engine/metrics"
+    "github.com/bitesinbyte/ferret/pkg/engine/telemetry"
+    "github.com/bitesinbyte/ferret/pkg/engine/queue"
 )
 
 func main() {

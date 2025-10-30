@@ -18,11 +18,11 @@ import (
     "github.com/bitesinbyte/ferret/pkg/calendar"
     "github.com/bitesinbyte/ferret/pkg/config"
     "github.com/bitesinbyte/ferret/pkg/external"
-    "github.com/bitesinbyte/ferret/pkg/metrics"
-    "github.com/bitesinbyte/ferret/pkg/telemetry"
+    "github.com/bitesinbyte/ferret/pkg/engine/metrics"
+    "github.com/bitesinbyte/ferret/pkg/engine/telemetry"
     "strconv"
-    "github.com/bitesinbyte/ferret/pkg/cache"
-    "github.com/bitesinbyte/ferret/pkg/queue"
+    "github.com/bitesinbyte/ferret/pkg/engine/cache"
+    "github.com/bitesinbyte/ferret/pkg/engine/queue"
 )
 
 func main() {

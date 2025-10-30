@@ -1,17 +1,17 @@
 // Auto-generated workflow: CRM Sync
-package main
+package workflows
 
 import (
 	"fmt"
+
 	"github.com/bitesinbyte/ferret/pkg/engine/auth"
 	"github.com/bitesinbyte/ferret/pkg/engine/cache"
 	"github.com/bitesinbyte/ferret/pkg/engine/factory"
 	"github.com/bitesinbyte/ferret/pkg/engine/queue"
 	"github.com/bitesinbyte/ferret/pkg/engine/telemetry"
-	"github.com/bitesinbyte/ferret/pkg/engine/workers"
 )
 
-func main() {
+func RunCRMSync() {
 	fmt.Println("Running Workflow: CRM Sync")
 	auth.JWTAuth{}.Authenticate()
 	cache.RedisCache{}.Save("workflow", "active")

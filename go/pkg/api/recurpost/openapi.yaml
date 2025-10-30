@@ -1,789 +1,535 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: RecurPost API
+  title: Deal Scale Recur Post (Sensitive)
   version: 1.0.0
+  description: ''
 servers:
-  - url: https://api.recurpost.example
+  - url: '{{baseURL}}'
+  - url: api.recurpost.com
+  - url: social.recurpost.com
 paths:
   /api/user_login:
     post:
-      summary: Login to RecurPost
-      parameters:
-        - in: query
-          name: emailid
-          required: false
-          schema:
-            type: string
-          description: Email address used to login (optional if provided in body)
-        - in: query
-          name: pass_key
-          required: false
-          schema:
-            type: string
-          description: Password key from account settings (optional if provided in body)
+      summary: Login
+      tags: []
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "Login successful"
+        "400":
+          description: Validation Error
+        "401":
+          description: Login Credential Error
+        "405":
+          description: Method Not Found
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/user_login\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscalere@gmail.com\",\r\n    \"pass_key\": \"YOUR_API_KEY_HERE\"\r\n  }'\r\n"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                emailid: { type: string }
-                pass_key: { type: string }
-              required: [emailid, pass_key]
-      responses:
-        '200':
-          description: Login response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserLoginResponse'
-        '400':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Login Credential Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '405':
-          description: Method Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /api/connect_social_account_urls:
-    post:
-      summary: Connect Social account URLs
-      parameters:
-        - in: query
-          name: emailid
-          required: false
-          schema:
-            type: string
-          description: Email id of user (optional if provided in body)
-        - in: query
-          name: pass_key
-          required: false
-          schema:
-            type: string
-          description: Password Key of user (from account settings) (optional if provided in body)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                emailid: { type: string }
-                pass_key: { type: string }
-              required: [emailid, pass_key]
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConnectURLsResponse'
-        '400':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Login Credential Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '405':
-          description: Method Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
   /api/social_account_list:
     post:
-      summary: Social account list
+      summary: Social List
+      tags: []
       parameters:
-        - in: query
-          name: emailid
-          required: true
+        - name: User-Agent
+          in: header
+          required: false
           schema:
             type: string
-          description: Email id of user
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
+          description: Successful Call
+          headers:
+            Date:
               schema:
-                $ref: '#/components/schemas/SocialAccountListResponse'
-        '400':
-          description: Validation Error
-          content:
-            application/json:
+                type: string
+            Server:
               schema:
-                $ref: '#/components/schemas/Error'
-  /api/library_list:
-    post:
-      summary: Library list
-      parameters:
-        - in: query
-          name: emailid
-          required: false
-          schema:
-            type: string
-          description: Email id of user (optional if provided in body)
-        - in: query
-          name: pass_key
-          required: false
-          schema:
-            type: string
-          description: Password Key of user (from account settings) (optional if provided in body)
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-Content-Type-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl --http1.1 -v -X POST \"https://api.recurpost.com/api/social_account_list\" \\\r\n  -H \"Accept: application/json, text/plain, */*\" \\\r\n  -H \"User-Agent: GoRecurPostClient/1.0\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"emailid\": \"dealscalere@gmail.com\", \"pass_key\": \"YOUR_API_KEY_HERE\"}'\r\n"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                emailid: { type: string }
-                pass_key: { type: string }
-              required: [emailid, pass_key]
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
+  /api/create_post:
+    post:
+      summary: Post Content
+      tags: []
+      parameters:
+        - name: User-Agent
+          in: header
+          required: false
+          schema:
+            deprecated: false
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
+          description: Failed Call 400
+          headers:
+            Date:
               schema:
-                $ref: '#/components/schemas/LibraryListResponse'
-        '400':
-          description: Validation Error
-          content:
-            application/json:
+                type: string
+            Server:
               schema:
-                $ref: '#/components/schemas/Error'
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-Content-Type-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://api.recurpost.com/api/create_post\" \\\r\n  -H \"Accept: application/json, text/plain, */*\" \\\r\n  -H \"User-Agent: GoRecurPostClient/1.0\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscalere@gmail.com\",\r\n    \"pass_key\": \"YOUR_API_KEY_HERE\",\r\n    \"account_id\": \"YOUR_RECURPOST_LINKEDIN_ACCOUNT_ID\",\r\n    \"text\": \"🚀 Testing live LinkedIn post from RecurPost API!\",\r\n    \"media\": []\r\n  }'\r\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
+                account_id:
+                  type: string
+                  format: utc-millisec
+                text:
+                  type: string
+                media:
+                  type: array
+                  items: {}
   /api/history_data:
     post:
-      summary: History data
-      parameters:
-        - in: query
-          name: emailid
-          required: false
-          schema: { type: string }
-          description: Email id of user (optional if provided in body)
-        - in: query
-          name: pass_key
-          required: false
-          schema: { type: string }
-          description: Password Key of user (optional if provided in body)
-        - in: query
-          name: id
-          required: false
-          schema: { type: string }
-          description: social account id
-        - in: query
-          name: is_get_video_updates
-          required: false
-          schema:
-            type: string
-            enum: ["true", "false"]
-            default: "true"
-          description: Get video posts (true/false)
+      summary: Get Posts
+      tags: []
+      responses:
+        '200':
+          description: Get LinkedIn Posts
+          headers:
+            Date:
+              schema:
+                type: string
+            Server:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-Content-Type-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/history_data\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscale@gmail.com\",\r\n    \"pass_key\": \"d0b81f9fdba84d485fd431da0b354b1e\",\r\n    \"id\": \"Q3oJoGs+PPSvmtkhGz7kmqg==\",\r\n    \"is_get_video_updates\": \"true\"\r\n  }'\r\n"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                emailid: { type: string }
-                pass_key: { type: string }
-                id: { type: string }
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
+                id:
+                  type: string
                 is_get_video_updates:
                   type: string
-                  enum: ["true", "false"]
-                  default: "true"
-              required: [emailid, pass_key]
+  /api/library_list:
+    post:
+      summary: Library List
+      tags: []
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
+          description: Successful Call
+          headers:
+            Date:
               schema:
-                $ref: '#/components/schemas/HistoryDataResponse'
-        '400':
-          description: Validation Error
-          content:
-            application/json:
+                type: string
+            Server:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Login Credential Error
-          content:
-            application/json:
+                type: string
+            X-Frame-Options:
               schema:
-                $ref: '#/components/schemas/Error'
-        '405':
-          description: Method Not Found
-          content:
-            application/json:
+                type: string
+            X-Content-Type-Options:
               schema:
-                $ref: '#/components/schemas/Error'
-  /api/add_content_in_library:
-    post:
-      summary: Add post in library
-      parameters:
-        - in: query
-          name: emailid
-          required: false
-          schema: { type: string }
-          description: Email id of user (optional if provided in body)
-        - in: query
-          name: pass_key
-          required: false
-          schema: { type: string }
-          description: Password Key of user (optional if provided in body)
-        - in: query
-          name: id
-          required: false
-          schema: { type: string }
-          description: library id
-        - in: query
-          name: message
-          required: false
-          schema: { type: string }
-          description: Message/Content for post
-        - in: query
-          name: fb_message
-          required: false
-          schema: { type: string }
-          description: Custom Facebook message
-        - in: query
-          name: tw_message
-          required: false
-          schema: { type: string }
-          description: Custom X (Twitter) message
-        - in: query
-          name: ln_message
-          required: false
-          schema: { type: string }
-          description: Custom LinkedIn message
-        - in: query
-          name: in_message
-          required: false
-          schema: { type: string }
-          description: Custom Instagram message
-        - in: query
-          name: gmb_message
-          required: false
-          schema: { type: string }
-          description: Custom Google Business Profile message
-        - in: query
-          name: pi_message
-          required: false
-          schema: { type: string }
-          description: Custom Pinterest message
-        - in: query
-          name: yt_message
-          required: false
-          schema: { type: string }
-          description: Custom YouTube message
-        - in: query
-          name: tk_message
-          required: false
-          schema: { type: string }
-          description: Custom TikTok message
-        - in: query
-          name: th_message
-          required: false
-          schema: { type: string }
-          description: Custom Meta Threads message
-        - in: query
-          name: bs_message
-          required: false
-          schema: { type: string }
-          description: Custom Bluesky message
-        - in: query
-          name: url
-          required: false
-          schema: { type: string }
-          description: Website URL
-        - in: query
-          name: image_url
-          required: false
-          schema: { type: string }
-          description: Comma-separated image URLs (e.g., image1.jpg,image2.jpg)
-        - in: query
-          name: video_url
-          required: false
-          schema: { type: string }
-          description: Video URL
-        - in: query
-          name: fb_post_type
-          required: false
-          schema:
-            type: string
-            enum: [feed, story, reel]
-            default: feed
-          description: Facebook Post Type
-        - in: query
-          name: in_post_type
-          required: false
-          schema:
-            type: string
-          description: Instagram Post Type
-        - in: query
-          name: in_reel_share_in_feed
-          required: false
-          schema:
-            type: string
-            enum: ["yes", "no"]
-            default: "yes"
-          description: Instagram Reel post as Feed also (only when post type is reel)
-        - in: query
-          name: first_comment
-          required: false
-          schema: { type: string }
-          description: First Comment (FB Pages, LinkedIn, Instagram Feed)
-        - in: query
-          name: fb_first_comment
-          required: false
-          schema: { type: string }
-          description: Facebook First Comment
-        - in: query
-          name: ln_first_comment
-          required: false
-          schema: { type: string }
-          description: LinkedIn First Comment
-        - in: query
-          name: in_first_comment
-          required: false
-          schema: { type: string }
-          description: Instagram First Comment
-        - in: query
-          name: ln_document
-          required: false
-          schema: { type: string }
-          description: LinkedIn Document Link (carousel - ppt, pdf, docs)
-        - in: query
-          name: ln_document_title
-          required: false
-          schema: { type: string }
-          description: LinkedIn Document Title
-        - in: query
-          name: pi_title
-          required: false
-          schema: { type: string }
-          description: Pinterest Title
-        - in: query
-          name: gbp_cta
-          required: false
-          schema:
-            type: string
-            enum: ["None", "Learn more", "Sign up", "Buy", "Order online", "Book", "Call now", "Offer"]
-            default: "None"
-          description: Google Business Profile Call To Action
-        - in: query
-          name: gbp_cta_url
-          required: false
-          schema: { type: string }
-          description: GBP - Call To Action URL (omit for 'Call now' and 'Offer')
-        - in: query
-          name: gbp_offer_title
-          required: false
-          schema: { type: string }
-          description: GBP Offer Title
-        - in: query
-          name: gbp_offer_start_date
-          required: false
-          schema: { type: string }
-          description: GBP Offer Start Date (e.g., 2023-06-23 18:20:22)
-        - in: query
-          name: gbp_offer_end_date
-          required: false
-          schema: { type: string }
-          description: GBP Offer End Date (e.g., 2023-06-25 18:20:22)
-        - in: query
-          name: gbp_offer_coupon_code
-          required: false
-          schema: { type: string }
-          description: GBP Offer Coupon Code
-        - in: query
-          name: gbp_offer_terms
-          required: false
-          schema: { type: string }
-          description: GBP Offer Terms and conditions (optional)
-        - in: query
-          name: gbp_redeem_offer_link
-          required: false
-          schema: { type: string }
-          description: GBP Link to redeem offer (optional)
-        - in: query
-          name: yt_title
-          required: false
-          schema: { type: string }
-          description: YouTube Title
-        - in: query
-          name: yt_category
-          required: false
-          schema:
-            type: string
-            enum: ["Film & Animation", "Autos & Vehicles", "Music", "Pets & Animals", "Sports", "Travel & Events", "Gaming", "People & Blogs", "Comedy", "Entertainment", "News & Politics", "Howto & Style", "Education", "Science & Technology", "Nonprofits & Activism"]
-            default: "Entertainment"
-          description: YouTube Category
-        - in: query
-          name: yt_privacy_status
-          required: false
-          schema:
-            type: string
-            enum: ["Public", "Private", "Unlisted"]
-            default: "Public"
-          description: YouTube Privacy Status
-        - in: query
-          name: yt_user_tags
-          required: false
-          schema: { type: string }
-          description: YouTube user tags (comma-separated)
-        - in: query
-          name: yt_thumb
-          required: false
-          schema: { type: string }
-          description: YouTube Thumbnail URL (optional)
-        - in: query
-          name: yt_video_made_for_kids
-          required: false
-          schema:
-            type: string
-            enum: ["yes", "no"]
-            default: "yes"
-          description: YouTube video Made For Kids
-        - in: query
-          name: tk_privacy_status
-          required: false
-          schema:
-            type: string
-            enum: ["Public to Everyone", "Mutual Follow Friends", "Self Only"]
-            default: "Public to Everyone"
-          description: TikTok Privacy Status
-        - in: query
-          name: tk_allow_comments
-          required: false
-          schema:
-            type: string
-            enum: ["yes", "no"]
-          description: TikTok Allow Comments on post
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/library_list\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscale@gmail.com\",\r\n    \"pass_key\": \"d0b81f9fdba84d485fd431da0b354b1e\"\r\n  }'\r\n"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                emailid: { type: string }
-                pass_key: { type: string }
-                id: { type: string }
-                message: { type: string }
-                fb_message: { type: string }
-                tw_message: { type: string }
-                ln_message: { type: string }
-                in_message: { type: string }
-                gmb_message: { type: string }
-                pi_message: { type: string }
-                yt_message: { type: string }
-                tk_message: { type: string }
-                th_message: { type: string }
-                bs_message: { type: string }
-                url: { type: string }
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
+  /api/connect_social_account_urls:
+    post:
+      summary: Fetch Social Account Connection URLs
+      tags: []
+      responses:
+        '200':
+          description: Successful Call
+          headers:
+            Date:
+              schema:
+                type: string
+            Server:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-Content-Type-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/connect_social_account_urls\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscale@gmail.com\",\r\n    \"pass_key\": \"d0b81f9fdba84d485fd431da0b354b1e\"\r\n  }'\r\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/add_content_in_library:
+    post:
+      summary: Add content to library
+      tags: []
+      responses:
+        '200':
+          description: Successful call
+          headers:
+            Date:
+              schema:
+                type: string
+            Server:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-Content-Type-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/add_content_in_library\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscalere@gmail.com\",\r\n    \"pass_key\": \"d0b81f9fdba84d485fd431da0b354b1e\",\r\n    \"id\": \"Dd/nISKRuFgMXEciGu5lUQ==\",\r\n    \"message\": \"Testing library add via API from DealScale\",\r\n    \"ln_message\": \"Testing LinkedIn variant from DealScale\",\r\n    \"url\": \"https://www.dealscale.io\",\r\n    \"image_url\": [\"https://sm.mashable.com/t/mashable_in/photo/default/z3wq-2025-10-29t114918073_hq9h.3200.jpg\"],\r\n    \"host_images_on_recurpost\": \"true\"\r\n  }'\r\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailid:
+                  type: string
+                pass_key:
+                  type: string
+                id:
+                  type: string
+                message:
+                  type: string
+                ln_message:
+                  type: string
+                url:
+                  type: string
+                  format: uri
                 image_url:
                   type: array
-                  items: { type: string }
-                video_url: { type: string }
-                fb_post_type:
+                  items:
+                    type: string
+                    format: uri
+                host_images_on_recurpost:
                   type: string
-                  enum: [feed, story, reel]
-                  default: feed
-                in_post_type: { type: string }
-                in_reel_share_in_feed:
-                  type: string
-                  enum: ["yes", "no"]
-                  default: "yes"
-                first_comment: { type: string }
-                fb_first_comment: { type: string }
-                ln_first_comment: { type: string }
-                in_first_comment: { type: string }
-                ln_document: { type: string }
-                ln_document_title: { type: string }
-                pi_title: { type: string }
-                gbp_cta:
-                  type: string
-                  enum: ["None", "Learn more", "Sign up", "Buy", "Order online", "Book", "Call now", "Offer"]
-                  default: "None"
-                gbp_cta_url: { type: string }
-                gbp_offer_title: { type: string }
-                gbp_offer_start_date: { type: string }
-                gbp_offer_end_date: { type: string }
-                gbp_offer_coupon_code: { type: string }
-                gbp_offer_terms: { type: string }
-                gbp_redeem_offer_link: { type: string }
-                yt_title: { type: string }
-                yt_category:
-                  type: string
-                  enum: ["Film & Animation", "Autos & Vehicles", "Music", "Pets & Animals", "Sports", "Travel & Events", "Gaming", "People & Blogs", "Comedy", "Entertainment", "News & Politics", "Howto & Style", "Education", "Science & Technology", "Nonprofits & Activism"]
-                  default: "Entertainment"
-                yt_privacy_status:
-                  type: string
-                  enum: ["Public", "Private", "Unlisted"]
-                  default: "Public"
-                yt_user_tags:
-                  type: array
-                  items: { type: string }
-                yt_thumb: { type: string }
-                yt_video_made_for_kids:
-                  type: string
-                  enum: ["yes", "no"]
-                  default: "yes"
-                tk_privacy_status:
-                  type: string
-                  enum: ["Public to Everyone", "Mutual Follow Friends", "Self Only"]
-                  default: "Public to Everyone"
-                tk_allow_comments:
-                  type: string
-                  enum: ["yes", "no"]
-              required: [emailid, pass_key, id, message]
+  /api/generate_content_with_ai:
+    post:
+      summary: Generate Content AI
+      tags: []
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
+          description: Successful Call
+          headers:
+            Date:
               schema:
-                $ref: '#/components/schemas/AddContentInLibraryResponse'
-        '400':
-          description: Validation Error
-          content:
-            application/json:
+                type: string
+            Server:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Login Credential Error
-          content:
-            application/json:
+                type: string
+            X-Frame-Options:
               schema:
-                $ref: '#/components/schemas/Error'
-        '405':
-          description: Method Not Found
-          content:
-            application/json:
+                type: string
+            X-Content-Type-Options:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Login Credential Error
-          content:
-            application/json:
+                type: string
+            X-XSS-Protection:
               schema:
-                $ref: '#/components/schemas/Error'
-        '405':
-          description: Method Not Found
-          content:
-            application/json:
+                type: integer
+            Referrer-Policy:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Login Credential Error
-          content:
-            application/json:
+                type: string
+            Access-Control-Allow-Origin:
               schema:
-                $ref: '#/components/schemas/Error'
-        '405':
-          description: Method Not Found
-          content:
-            application/json:
+                type: string
+            Access-Control-Allow-Methods:
               schema:
-                $ref: '#/components/schemas/Error'
-  /oauth/token:
-    post:
-      summary: Exchange credentials for access token
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/generate_content_with_ai\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscalere@gmail.com\",\r\n    \"pass_key\": \"d0b81f9fdba84d485fd431da0b354b1e\",\r\n    \"prompt_text\": \"Write a LinkedIn post about how AI is changing real estate marketing.\",\r\n    \"ai_id\": \"\",\r\n    \"chat_progress\": \"\"\r\n  }'\r\n"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthTokenRequest'
-      responses:
-        '200':
-          description: Token response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthTokenResponse'
-  /accounts:
-    get:
-      summary: List connected accounts/profiles
-      responses:
-        '200':
-          description: Accounts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Account'
-  /posts:
-    get:
-      summary: List posts
-      parameters:
-        - in: query
-          name: page
-          schema: { type: integer, minimum: 1 }
-        - in: query
-          name: page_size
-          schema: { type: integer, minimum: 1, maximum: 200 }
-      responses:
-        '200':
-          description: Posts
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostList'
+              type: object
+              properties:
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
+                prompt_text:
+                  type: string
+                ai_id:
+                  type: string
+                chat_progress:
+                  type: string
+  /api/generate_image_with_ai:
     post:
-      summary: Create a post
+      summary: Generate Image AI
+      tags: []
+      responses:
+        '200':
+          description: Successful Call
+          headers:
+            Date:
+              schema:
+                type: string
+            Server:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-Content-Type-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Referrer-Policy:
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: "Generated from cURL: curl -X POST \"https://social.recurpost.com/api/generate_image_with_ai\" \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"emailid\": \"dealscalere@gmail.com\",\r\n    \"pass_key\": \"d0b81f9fdba84d485fd431da0b354b1e\",\r\n    \"prompt_text\": \"A futuristic real estate office powered by artificial intelligence, with holographic dashboards and modern architecture\"\r\n  }'\r\n"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePostRequest'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-  /posts/{id}:
-    get:
-      summary: Get post
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Post
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-    delete:
-      summary: Delete post
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string }
-      responses:
-        '204': { description: Deleted }
-
-components:
-  schemas:
-    UserLoginResponse:
-      type: object
-      properties:
-        success: { type: boolean }
-        message: { type: string }
-        access_token: { type: string, nullable: true }
-    ConnectURLsResponse:
-      type: object
-      properties:
-        urls:
-          type: object
-          additionalProperties:
-            type: string
-    SocialAccountListResponse:
-      type: object
-      properties:
-        accounts:
-          type: array
-          items: { $ref: '#/components/schemas/Account' }
-    Library:
-      type: object
-      properties:
-        id: { type: string }
-        name: { type: string }
-        description: { type: string }
-    LibraryListResponse:
-      type: object
-      properties:
-        libraries:
-          type: array
-          items: { $ref: '#/components/schemas/Library' }
-    HistoryDataResponse:
-      type: object
-      additionalProperties: true
-    AddContentInLibraryResponse:
-      type: object
-      properties:
-        success: { type: boolean }
-        message: { type: string }
-        content_id: { type: string }
-    Error:
-      type: object
-      properties:
-        code: { type: string }
-        message: { type: string }
-        details: { type: object, additionalProperties: true }
-    AuthTokenRequest:
-      type: object
-      properties:
-        grant_type: { type: string, enum: [password, refresh_token] }
-        username: { type: string }
-        password: { type: string }
-        refresh_token: { type: string }
-      required: [grant_type]
-    AuthTokenResponse:
-      type: object
-      properties:
-        access_token: { type: string }
-        token_type: { type: string }
-        expires_in: { type: integer }
-        refresh_token: { type: string }
-    Account:
-      type: object
-      properties:
-        id: { type: string }
-        provider: { type: string }
-        handle: { type: string }
-        display_name: { type: string }
-    Post:
-      type: object
-      properties:
-        id: { type: string }
-        text: { type: string }
-        media_ids:
-          type: array
-          items: { type: string }
-        scheduled_at: { type: string, format: date-time }
-        status: { type: string, enum: [draft, scheduled, published, failed] }
-    PostList:
-      type: object
-      properties:
-        items:
-          type: array
-          items: { $ref: '#/components/schemas/Post' }
-        next_page: { type: integer, nullable: true }
-    CreatePostRequest:
-      type: object
-      properties:
-        text: { type: string }
-        media_ids:
-          type: array
-          items: { type: string }
-        scheduled_at: { type: string, format: date-time, nullable: true }
-      required: [text]
+              type: object
+              properties:
+                emailid:
+                  type: string
+                  format: email
+                pass_key:
+                  type: string
+                prompt_text:
+                  type: string

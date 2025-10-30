@@ -1,15 +1,15 @@
 package server
 
 import (
-	"database/sql"
-	"embed"
-	"net/http"
-	"time"
+    "database/sql"
+    "embed"
+    "net/http"
+    "time"
 
-	"github.com/bitesinbyte/ferret/pkg/api/types"
-	appdb "github.com/bitesinbyte/ferret/pkg/db"
-	"github.com/bitesinbyte/ferret/pkg/telemetry"
-	"github.com/gin-gonic/gin"
+    "github.com/bitesinbyte/ferret/pkg/api/types"
+    appdb "github.com/bitesinbyte/ferret/pkg/db"
+    "github.com/bitesinbyte/ferret/pkg/engine/telemetry"
+    "github.com/gin-gonic/gin"
 )
 
 var sqlDB = (*sql.DB)(nil)

@@ -1,16 +1,15 @@
 package server
 
 import (
-	"database/sql"
-	"net/http"
-	"strings"
-	"time"
+    "database/sql"
+    "net/http"
+    "os"
+    "strings"
+    "time"
 
-	"os"
-
-	"github.com/bitesinbyte/ferret/pkg/api/types"
-	"github.com/bitesinbyte/ferret/pkg/auth"
-	"github.com/gin-gonic/gin"
+    "github.com/bitesinbyte/ferret/pkg/api/types"
+    "github.com/bitesinbyte/ferret/pkg/engine/auth"
+    "github.com/gin-gonic/gin"
 )
 
 func signupHandler(c *gin.Context) {

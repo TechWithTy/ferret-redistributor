@@ -1,20 +1,21 @@
 package recurpost_test
 
 import (
-	"context"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"testing"
+    "context"
+    "encoding/json"
+    "net/http"
+    "net/http/httptest"
+    "os"
+    "testing"
 
-	rp "github.com/bitesinbyte/ferret/pkg/api/recurpost"
-	"github.com/joho/godotenv"
+    rp "github.com/bitesinbyte/ferret/pkg/api/recurpost"
+    "github.com/joho/godotenv"
 )
 
 // TestLinkedinPost verifies posting to LinkedIn via RecurPost's /api/post_content flow.
 // It uses local helpers so this file can run alone if needed.
-func TestLinkedinPost_Mock(t *testing.T) {    email, pass := getCredsLinkedIn(t)
+func TestLinkedinPost_Mock(t *testing.T) {
+    email, pass := getCredsLinkedIn(t)
 
     // Mock RecurPost backend for /api/post_content
     srv := newMockServerLinkedIn(t, map[string]http.HandlerFunc{
@@ -60,7 +61,7 @@ func TestLinkedinPost_Mock(t *testing.T) {    email, pass := getCredsLinkedIn(t)
 }
 
 // Local helpers so this file can run standalone if invoked directly.
-func getCredsLinkedInMock(t *testing.T) (email, pass string) {
+func getCredsLinkedIn(t *testing.T) (email, pass string) {
     t.Helper()
     _ = godotenv.Load("../../../../.env")
     email = os.Getenv("RECURPOST_EMAIL")
@@ -71,7 +72,7 @@ func getCredsLinkedInMock(t *testing.T) (email, pass string) {
     return
 }
 
-func newMockServerLinkedInMock(t *testing.T, routes map[string]http.HandlerFunc) *httptest.Server {
+func newMockServerLinkedIn(t *testing.T, routes map[string]http.HandlerFunc) *httptest.Server {
     t.Helper()
     mux := http.NewServeMux()
     for p, h := range routes {
@@ -80,7 +81,7 @@ func newMockServerLinkedInMock(t *testing.T, routes map[string]http.HandlerFunc)
     return httptest.NewServer(mux)
 }
 
-// newClientLIMock constructs a RecurPost client pointing to a base URL (e.g., mock server).
-func newClientLIMock(base string) *rp.Client {
+// newClientLI constructs a RecurPost client pointing to a base URL (e.g., mock server).
+func newClientLI(base string) *rp.Client {
     return rp.NewClient(rp.WithBaseURL(base))
 }

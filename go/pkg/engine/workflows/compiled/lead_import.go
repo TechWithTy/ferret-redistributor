@@ -1,17 +1,16 @@
 // Auto-generated workflow: Lead Import
-package main
+package workflows
 
 import (
-	"fmt"
-	"github.com/bitesinbyte/ferret/pkg/engine/auth"
-	"github.com/bitesinbyte/ferret/pkg/engine/cache"
-	"github.com/bitesinbyte/ferret/pkg/engine/factory"
-	"github.com/bitesinbyte/ferret/pkg/engine/queue"
-	"github.com/bitesinbyte/ferret/pkg/engine/telemetry"
-	"github.com/bitesinbyte/ferret/pkg/engine/workers"
+    "fmt"
+    "github.com/bitesinbyte/ferret/pkg/engine/auth"
+    "github.com/bitesinbyte/ferret/pkg/engine/cache"
+    "github.com/bitesinbyte/ferret/pkg/engine/factory"
+    "github.com/bitesinbyte/ferret/pkg/engine/queue"
+    "github.com/bitesinbyte/ferret/pkg/engine/telemetry"
 )
 
-func main() {
+func RunLeadImport() {
 	fmt.Println("Running Workflow: Lead Import")
 	auth.JWTAuth{}.Authenticate()
 	cache.RedisCache{}.Save("workflow", "active")

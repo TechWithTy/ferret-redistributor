@@ -41,11 +41,11 @@ func WithHTTPClient(h *http.Client) Option { return func(c *Client) { c.http = h
 func WithUserAgent(ua string) Option       { return func(c *Client) { c.userAgent = ua } }
 
 func NewClient(opts ...Option) *Client {
-	c := &Client{
-		baseURL:   "https://api.recurpost.example",
-		http:      &http.Client{Timeout: 30 * time.Second},
-		userAgent: "Ferret-RecurPost/0.1",
-	}
+    c := &Client{
+        baseURL:   "https://social.recurpost.com",
+        http:      &http.Client{Timeout: 30 * time.Second},
+        userAgent: "Ferret-RecurPost/0.1",
+    }
 	for _, o := range opts {
 		o(c)
 	}
