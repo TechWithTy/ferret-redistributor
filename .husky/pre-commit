@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Enable error handling
+set -e
+
+echo "🚀 Starting pre-commit checks..."
+
+# Change to the go directory if it exists
+if [ -d "go" ]; then
+    cd go
+    echo "📂 Entered go directory"
+    
+    # Run go fmt
+    echo "🔄 Running go fmt..."
+    go fmt ./...
+    
+    # Run golangci-lint
+    echo "🔍 Running golangci-lint..."
+    golangci-lint run
+    
+    # Return to the original directory
+    cd ..
+    
+    echo "✅ Go pre-commit checks completed successfully!"
+else
+    echo "⚠️  Warning: 'go' directory not found. Skipping Go pre-commit checks."
+fi
+
+echo "✨ All pre-commit checks passed!"
