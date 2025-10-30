@@ -1,4 +1,4 @@
-package recurpost_test
+package recurpost
 
 import (
     "os"

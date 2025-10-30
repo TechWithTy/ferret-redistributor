@@ -1,5 +1,31 @@
 # 🐶 Husky Git Hooks
+Husky Pre-Commit Hook
 
+This repository uses Husky to run language-specific checks before each commit.
+
+What runs
+- Go: `go fmt ./...` and, if available, `golangci-lint run`
+- Python: `ruff check`, `black --check`, `isort --check-only`, and `mypy` if installed
+
+Auto-detection
+- Go checks run only if Go files or the `go/` module are present
+- Python checks run only if Python files or common config files exist, or a `python/` folder exists
+
+Windows notes
+- Use Git Bash for hooks. Ensure the hook file uses LF endings
+- You can enforce LF with a `.gitattributes` entry (see repo root)
+
+Setup
+1) Make the hook executable (Git Bash): `chmod +x .husky/pre-commit`
+2) Point Git to Husky hooks: `git config --local core.hooksPath .husky`
+
+Tools
+- Go: `go` and optionally `golangci-lint`
+- Python: `python` and optionally `ruff`, `black`, `isort`, `mypy`
+
+Notes
+- If a tool is not installed, the hook prints a skip message and continues
+- Any failing tool will block the commit with a clear error message
 This directory contains Git hooks managed by [Husky](https://github.com/automation-co/husky).
 
 ## 🚀 Pre-commit Hook

@@ -1,5 +1,152 @@
 #!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
+echo "[husky] pre-commit: starting checks…"
+
+# Always run from repo root
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$ROOT_DIR"
+
+check_cmd() { command -v "$1" >/dev/null 2>&1; }
+
+status_ok=true
+
+########################################
+# Go checks (run only if Go is present)
+########################################
+
+has_go_files="$(git ls-files '*.go' 2>/dev/null | wc -l | tr -d ' ')"
+if [ -d "go" ] || [ "${has_go_files}" != "0" ]; then
+  echo "[husky][go] detected. Running format and lint…"
+
+  if ! check_cmd go; then
+    echo "[husky][go] 'go' tool not found. Skipping Go checks."
+  else
+    if [ -d "go" ] && [ -f "go/go.mod" ]; then
+      pushd go >/dev/null
+      echo "[husky][go] go fmt ./…"
+      if ! go fmt ./...; then
+        echo "[husky][go] go fmt failed"
+        status_ok=false
+      fi
+
+      if check_cmd golangci-lint; then
+        echo "[husky][go] golangci-lint run"
+        if ! golangci-lint run; then
+          echo "[husky][go] golangci-lint failed"
+          status_ok=false
+        fi
+      else
+        echo "[husky][go] golangci-lint not found. Skipping lint."
+      fi
+      popd >/dev/null
+    else
+      echo "[husky][go] No 'go/go.mod' found; running go fmt from repo root"
+      if ! go fmt ./...; then
+        echo "[husky][go] go fmt failed"
+        status_ok=false
+      fi
+
+      if check_cmd golangci-lint; then
+        echo "[husky][go] golangci-lint run"
+        if ! golangci-lint run; then
+          echo "[husky][go] golangci-lint failed"
+          status_ok=false
+        fi
+      else
+        echo "[husky][go] golangci-lint not found. Skipping lint."
+      fi
+    fi
+  fi
+else
+  echo "[husky][go] no Go files detected. Skipping."
+fi
+
+########################################
+# Python checks (run only if Python present)
+########################################
+
+has_py_files="$(git ls-files '*.py' 2>/dev/null | wc -l | tr -d ' ')"
+if [ -d "python" ] || [ -f "pyproject.toml" ] || [ -f "requirements.txt" ] || [ "${has_py_files}" != "0" ]; then
+  echo "[husky][py] detected. Running format and lint…"
+
+  if ! check_cmd python && ! check_cmd python3; then
+    echo "[husky][py] Python not found. Skipping Python checks."
+  else
+    PY_CMD="python"
+    check_cmd python || PY_CMD="python3"
+
+    ENTERED=false
+    if [ -d "python" ]; then
+      pushd python >/dev/null
+      ENTERED=true
+    fi
+
+    if check_cmd ruff; then
+      echo "[husky][py] ruff check ."
+      if ! ruff check .; then
+        echo "[husky][py] ruff failed"
+        status_ok=false
+      fi
+    else
+      echo "[husky][py] ruff not found. Skipping lint."
+    fi
+
+    if check_cmd black; then
+      echo "[husky][py] black --check ."
+      if ! black --check .; then
+        echo "[husky][py] black found formatting issues (run 'black .')"
+        status_ok=false
+      fi
+    else
+      # Try module invocation if available
+      if "$PY_CMD" -c "import black" >/dev/null 2>&1; then
+        echo "[husky][py] python -m black --check ."
+        if ! "$PY_CMD" -m black --check .; then
+          echo "[husky][py] black found formatting issues (run 'python -m black .')"
+          status_ok=false
+        fi
+      else
+        echo "[husky][py] black not found. Skipping format check."
+      fi
+    fi
+
+    if check_cmd isort; then
+      echo "[husky][py] isort --check-only ."
+      if ! isort --check-only .; then
+        echo "[husky][py] isort failed"
+        status_ok=false
+      fi
+    else
+      echo "[husky][py] isort not found. Skipping import order check."
+    fi
+
+    if check_cmd mypy; then
+      echo "[husky][py] mypy ."
+      if ! mypy .; then
+        echo "[husky][py] mypy type-check failed"
+        status_ok=false
+      fi
+    else
+      echo "[husky][py] mypy not found. Skipping type checks."
+    fi
+
+    if [ "$ENTERED" = true ]; then
+      popd >/dev/null
+    fi
+  fi
+else
+  echo "[husky][py] no Python files detected. Skipping."
+fi
+
+if [ "$status_ok" != true ]; then
+  echo "[husky] pre-commit: checks failed."
+  exit 1
+fi
+
+echo "[husky] pre-commit: all checks passed."
+exit 0
 # Enable error handling
 set -e
 
