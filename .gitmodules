@@ -43,3 +43,9 @@
 [submodule "go/pkg/mcp-go"]
 	path = go/pkg/mcp-go
 	url = https://github.com/Deal-Scale/mcp-go.git
+[submodule "python/ai-ml-models/_media/fal"]
+	path = python/ai-ml-models/_media/fal
+	url = https://github.com/Deal-Scale/fal.git
+[submodule "go/pkg/api/openroutergo"]
+	path = go/pkg/api/openroutergo
+	url = https://github.com/Deal-Scale/openroutergo.git

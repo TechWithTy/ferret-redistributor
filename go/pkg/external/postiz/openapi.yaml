@@ -1,0 +1,403 @@
+openapi: 3.0.3
+info:
+  title: Postiz Public API
+  version: "1.0.0"
+  description: |
+    OpenAPI description for the Postiz Public API consumed by the Go SDK.
+servers:
+  - url: https://api.postiz.com/public/v1
+    description: Hosted Postiz
+  - url: https://{baseUrl}/public/v1
+    description: Self-hosted Postiz
+    variables:
+      baseUrl:
+        default: localhost:5000
+security:
+  - ApiKeyAuth: []
+paths:
+  /integrations:
+    get:
+      summary: List connected channels
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Integration"
+  /find-slot/{id}:
+    get:
+      summary: Find next available slot for an integration
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Slot response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlotResponse"
+  /upload:
+    post:
+      summary: Upload a media file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Uploaded file metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileAsset"
+  /upload-from-url:
+    post:
+      summary: Register media hosted elsewhere
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadFromURLRequest"
+      responses:
+        "200":
+          description: Uploaded file metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileAsset"
+  /posts:
+    get:
+      summary: List posts in time range
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date-time
+          required: true
+        - in: query
+          name: customer
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostsResponse"
+    post:
+      summary: Create or update posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostsRequest"
+      responses:
+        "200":
+          description: Post creation response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreatePostsResponse"
+  /posts/{id}:
+    delete:
+      summary: Delete a post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePostResponse"
+  /generate-video:
+    post:
+      summary: Generate an AI-powered video
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VideoRequest"
+      responses:
+        "200":
+          description: Generated video assets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VideoAsset"
+  /video/function:
+    post:
+      summary: Invoke video helper functions (e.g., load voices)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VideoFunctionRequest"
+      responses:
+        "200":
+          description: Helper data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoFunctionResponse"
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    Integration:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        identifier:
+          type: string
+        picture:
+          type: string
+          format: uri
+        disabled:
+          type: boolean
+        profile:
+          type: string
+        customer:
+          $ref: "#/components/schemas/CustomerInfo"
+    CustomerInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    SlotResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+    FileAsset:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        path:
+          type: string
+          format: uri
+        organizationId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UploadFromURLRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+    PostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        publishDate:
+          type: string
+          format: date-time
+        releaseURL:
+          type: string
+          format: uri
+        state:
+          type: string
+          enum: [QUEUE, PUBLISHED, ERROR, DRAFT]
+        integration:
+          $ref: "#/components/schemas/IntegrationDigest"
+    IntegrationDigest:
+      type: object
+      properties:
+        id:
+          type: string
+        providerIdentifier:
+          type: string
+        name:
+          type: string
+        picture:
+          type: string
+          format: uri
+    CreatePostsRequest:
+      type: object
+      required: [type, shortLink, date, posts]
+      properties:
+        type:
+          type: string
+          enum: [draft, schedule, now]
+        order:
+          type: string
+        shortLink:
+          type: boolean
+        inter:
+          type: integer
+        date:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostDraft"
+    PostDraft:
+      type: object
+      required: [integration, value]
+      properties:
+        integration:
+          $ref: "#/components/schemas/IntegrationRef"
+        value:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostValue"
+        group:
+          type: string
+        settings:
+          type: object
+          additionalProperties: true
+    PostValue:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+        id:
+          type: string
+        image:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+        path:
+          type: string
+          format: uri
+    IntegrationRef:
+      type: object
+      properties:
+        id:
+          type: string
+    Tag:
+      type: object
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+    CreatePostsResponse:
+      type: object
+      properties:
+        postId:
+          type: string
+        integration:
+          type: string
+    DeletePostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+    VideoRequest:
+      type: object
+      required: [type, output]
+      properties:
+        type:
+          type: string
+          enum: [image-text-slides, veo3]
+        output:
+          type: string
+          enum: [vertical, horizontal]
+        customParams:
+          type: object
+          additionalProperties: true
+    VideoAsset:
+      type: object
+      properties:
+        id:
+          type: string
+        path:
+          type: string
+          format: uri
+    VideoFunctionRequest:
+      type: object
+      required: [functionName, identifier]
+      properties:
+        functionName:
+          type: string
+        identifier:
+          type: string
+    VideoFunctionResponse:
+      type: object
+      properties:
+        voices:
+          type: array
+          items:
+            $ref: "#/components/schemas/VideoVoice"
+    VideoVoice:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+

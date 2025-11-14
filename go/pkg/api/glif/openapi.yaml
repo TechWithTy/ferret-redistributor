@@ -1,0 +1,169 @@
+openapi: 3.0.3
+info:
+  title: Glif Simple API
+  version: "1.0.0"
+  description: |
+    Minimal OpenAPI representation for the Glif Simple API and REST endpoints used by Ferret.
+servers:
+  - url: https://simple-api.glif.app
+    description: Simple API base (workflow runs)
+  - url: https://glif.app/api
+    description: REST API base (workflow metadata)
+paths:
+  /:
+    post:
+      summary: Run workflow (JSON body)
+      description: >
+        Execute a workflow by sending positional or named inputs in the request body. Use the `strict` query
+        parameter to ensure missing inputs fail immediately. When invoking by path (`/{workflowId}`), omit the `id`
+        field and provide the workflow ID in the URL.
+      parameters:
+        - in: query
+          name: strict
+          required: false
+          schema:
+            type: boolean
+          description: When true, causes the workflow to fail if required inputs are missing.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunWorkflowPayload"
+      responses:
+        "200":
+          description: Workflow run result (even when errors are present).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunWorkflowResponse"
+  "/{workflowId}":
+    post:
+      summary: Run workflow (path ID)
+      parameters:
+        - in: path
+          name: workflowId
+          required: true
+          schema:
+            type: string
+          description: Workflow identifier embedded in the URL (UsePathID=true).
+        - in: query
+          name: strict
+          required: false
+          schema:
+            type: boolean
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunWorkflowPayload"
+      responses:
+        "200":
+          description: Workflow run result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunWorkflowResponse"
+  /glifs:
+    get:
+      summary: Get workflow metadata
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Workflow collection
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workflow"
+components:
+  schemas:
+    RunWorkflowPayload:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Required when not using the path ID style.
+        inputs:
+          oneOf:
+            - type: array
+              description: Positional inputs
+              items:
+                type: string
+            - type: object
+              description: Named inputs keyed by block name
+              additionalProperties:
+                type: string
+        visibility:
+          type: string
+          enum: [PRIVATE, PUBLIC]
+    RunWorkflowResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        inputs:
+          type: object
+          additionalProperties: true
+        output:
+          type: string
+          description: Primary output value (usually an asset URL or string)
+        outputFull:
+          type: object
+          additionalProperties: true
+        price:
+          type: string
+        nodes:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        error:
+          type: string
+          description: Present when the workflow failed. Simple API still returns HTTP 200.
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        output:
+          type: string
+        outputType:
+          type: string
+        user:
+          $ref: "#/components/schemas/WorkflowUser"
+        data:
+          $ref: "#/components/schemas/WorkflowData"
+    WorkflowUser:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        username: { type: string }
+        image: { type: string }
+    WorkflowData:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkflowNode"
+    WorkflowNode:
+      type: object
+      properties:
+        name: { type: string }
+        type: { type: string }
+        params:
+          type: object
+          additionalProperties: true
