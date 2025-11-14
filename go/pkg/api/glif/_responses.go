@@ -43,3 +43,4 @@ type WorkflowNode struct {
 	Type   string                     `json:"type"`
 	Params map[string]json.RawMessage `json:"params"`
 }
+

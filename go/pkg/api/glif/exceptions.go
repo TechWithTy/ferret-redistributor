@@ -25,3 +25,4 @@ type APIError struct {
 func (e *APIError) Error() string {
 	return fmt.Sprintf("glif: api error status=%d body=%s", e.StatusCode, string(e.Body))
 }
+

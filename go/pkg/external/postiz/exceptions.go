@@ -39,3 +39,4 @@ var (
 	// ErrMissingIdentifier indicates helper invocation without identifier.
 	ErrMissingIdentifier = errors.New("postiz: identifier is required")
 )
+

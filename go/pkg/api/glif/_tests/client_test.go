@@ -142,3 +142,4 @@ func TestGetWorkflow_NotFound(t *testing.T) {
 	require.Error(t, err)
 	assert.ErrorIs(t, err, glif.ErrWorkflowNotFound)
 }
+

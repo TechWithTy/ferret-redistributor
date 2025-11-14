@@ -49,3 +49,6 @@
 [submodule "go/pkg/api/openroutergo"]
 	path = go/pkg/api/openroutergo
 	url = https://github.com/Deal-Scale/openroutergo.git
+[submodule "python/rsshub"]
+	path = python/rsshub
+	url = https://github.com/Deal-Scale/RSSHub-python.git

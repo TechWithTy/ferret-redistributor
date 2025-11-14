@@ -37,3 +37,4 @@ func (c Config) normalizedTimeout() time.Duration {
 	}
 	return c.HTTPTimeout
 }
+
