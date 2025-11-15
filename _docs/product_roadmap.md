@@ -1,4 +1,4 @@
-# Ferret Redistributor - Product Roadmap
+# Social Scale - Product Roadmap
 
 ## 🚀 MVP (Weeks 1-8)
 

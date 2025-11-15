@@ -86,6 +86,20 @@ jobs:
         if: steps.validate.outputs.count != '0'
         run: go build -o go/bin/poster ./go/cmd/poster
 
+      - name: Run Postiz publisher
+        if: steps.validate.outputs.count != '0'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          POSTIZ_API_KEY: ${{ secrets.POSTIZ_API_KEY }}
+          POSTIZ_BASE_URL: ${{ vars.POSTIZ_BASE_URL }}
+          POSTIZ_INTEGRATIONS: ${{ vars.POSTIZ_INTEGRATIONS }}
+        run: |
+          if [ -z "${POSTIZ_API_KEY:-}" ]; then
+            echo "POSTIZ_API_KEY not provided; skipping Postiz publisher."
+            exit 0
+          fi
+          go run ./go/cmd/postizpublisher --input go/due_posts.json --database "$DATABASE_URL"
+
       - name: Run poster (updates DB)
         if: steps.validate.outputs.count != '0'
         env:

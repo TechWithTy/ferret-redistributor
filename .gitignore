@@ -75,6 +75,10 @@ terraform.tfvars
 .gcp/
 .azure/
 .terraform/
+
+# JavaScript/TypeScript dependencies
+node_modules/
+**/node_modules/
 # -------------------------------
 # 🔒 Sensitive & Environment Files
 # -------------------------------

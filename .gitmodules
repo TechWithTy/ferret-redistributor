@@ -8,47 +8,68 @@
 	path = google_analytics
 	url = https://github.com/TechWithTy/python/google_analytics.git
 [submodule "python/kling"]
-	path = python/kling
+	path = backend/python/kling
 	url = https://github.com/TechWithTy/kling.git
 [submodule "python/heygen_content"]
-	path = python/heygen_content
+	path = backend/python/heygen_content
 	url = https://github.com/TechWithTy/heygen_content.git
 [submodule "python/creatify"]
-	path = python/creatify
+	path = backend/python/creatify
 	url = https://github.com/TechWithTy/creatify.git
 [submodule "go/pkg/external/giphy"]
-	path = go/pkg/external/giphy
+	path = backend/go/pkg/external/giphy
 	url = https://github.com/TechWithTy/giphy-go.git
 [submodule "python/clarity"]
-	path = python/clarity
+	path = backend/python/clarity
 	url = https://github.com/TechWithTy/clarity.git
 [submodule "python/plausible"]
-	path = python/plausible
+	path = backend/python/plausible
 	url = https://github.com/TechWithTy/plausible.git
 [submodule "python/google-search-console"]
-	path = python/google-search-console
+	path = backend/python/google-search-console
 	url = https://github.com/TechWithTy/google-search-console-sdk.git
 [submodule "python/notion"]
-	path = python/notion
+	path = backend/python/notion
 	url = https://github.com/TechWithTy/notion.git
 [submodule "python/manychat"]
-	path = python/manychat
+	path = backend/python/manychat
 	url = https://github.com/TechWithTy/manychat.git
 [submodule "go/pkg/external/unsplash"]
-	path = go/pkg/external/unsplash
+	path = backend/go/pkg/external/unsplash
 	url = https://github.com/hbagdi/go-unsplash.git
 [submodule "python/igify"]
-	path = python/igify
+	path = backend/python/igify
 	url = https://github.com/TechWithTy/IGIfy-Remastered.git
 [submodule "go/pkg/mcp-go"]
-	path = go/pkg/mcp-go
+	path = backend/go/pkg/mcp-go
 	url = https://github.com/Deal-Scale/mcp-go.git
 [submodule "python/ai-ml-models/_media/fal"]
-	path = python/ai-ml-models/_media/fal
+	path = backend/python/ai-ml-models/_media/fal
 	url = https://github.com/Deal-Scale/fal.git
 [submodule "go/pkg/api/openroutergo"]
-	path = go/pkg/api/openroutergo
+	path = backend/go/pkg/api/openroutergo
 	url = https://github.com/Deal-Scale/openroutergo.git
 [submodule "python/rsshub"]
-	path = python/rsshub
+	path = backend/python/rsshub
 	url = https://github.com/Deal-Scale/RSSHub-python.git
+[submodule "c/ImageMagick"]
+	path = backend/c/ImageMagick
+	url = https://github.com/Deal-Scale/ImageMagick
+[submodule "go/pkg/external/gotoon"]
+	path = backend/go/pkg/external/gotoon
+	url = https://github.com/alpkeskin/gotoon
+[submodule "c/ctoon"]
+	path = backend/c/ctoon
+	url = https://github.com/mohammadraziei/ctoon
+[submodule "rust/toon-rust"]
+	path = backend/rust/toon-rust
+	url = https://github.com/toon-format/toon-rust
+[submodule "frontend/app"]
+	path = frontend/app
+	url = https://github.com/Deal-Scale/postiz-app.git
+[submodule "landing/deal-scale"]
+	path = landing/deal-scale
+	url = https://github.com/TechWithTy/deal-scale.git
+[submodule "typescript/editly"]
+	path = backend/typescript/editly
+	url = https://github.com/Deal-Scale/editly

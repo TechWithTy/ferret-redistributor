@@ -3,11 +3,11 @@
     <img src="https://github.com/bitesinbyte/ferret/raw/main/.github/images/logo.png" width="256px" />
   </a>
 </p>
-<h1 align="center">Ferret</h1>
+<h1 align="center">Social Scale</h1>
 
-Automate the syndication of RSS feed posts to various social media platforms seamlessly with Ferret. Simplify your content distribution process and reach your audience effortlessly.
+Automate the syndication of RSS feed posts to various social media platforms seamlessly with Social Scale. Simplify your content distribution process and reach your audience effortlessly.
 
-All updated docs and blog posts related to ferret can be found [here](https://blogs.bitesinbyte.com/categories/ferret/).
+All updated docs and blog posts related to Social Scale (formerly Ferret) can be found [here](https://blogs.bitesinbyte.com/categories/ferret/).
 
 ## Supported Social Sites
 
@@ -95,7 +95,7 @@ Follow these steps to configure the project for your use:
     }
     ```
 4. #### Enable workflow(GitHub Action)
-    By default, GitHub disables workflows when you fork a repository. Since Ferret depends on GitHub Actions/Workflows, you can enable them by following these steps:
+    By default, GitHub disables workflows when you fork a repository. Since Social Scale depends on GitHub Actions/Workflows, you can enable them by following these steps:
     - Navigate to the "Actions" tab.
     - Click "I understand my workflows, go ahead and enable them."
       ![workflow1](.github/images/workflow1.png)
