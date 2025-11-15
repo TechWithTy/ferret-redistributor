@@ -105,3 +105,4 @@ entities:
       metadata,json,false,"Arbitrary annotations (experiment IDs, persona tags)."
       sources_root,string,false,"Base path for relative assets."
 
+

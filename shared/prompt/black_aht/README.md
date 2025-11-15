@@ -11,3 +11,4 @@ Add new content in the corresponding subfolder and give each prompt a short
 description at the top of the file. Avoid committing sensitive data; use the
 `_mcp_deny` suffix if something must stay private to tooling.
 
+

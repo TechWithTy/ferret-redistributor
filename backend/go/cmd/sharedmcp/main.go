@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitesinbyte/ferret/pkg/mcp/sharedcontent"
 	"github.com/mark3labs/mcp-go/server"
+	mcpcat "github.com/mcpcat/mcpcat-go-sdk"
 )
 
 func main() {
@@ -36,6 +37,7 @@ func main() {
 		ignoreTokens = append(ignoreTokens, splitTokens(*flagIgnore)...)
 	}
 
+	hooks := &server.Hooks{}
 	srv := server.NewMCPServer(
 		"Shared Assets",
 		"0.1.0",
@@ -43,7 +45,12 @@ func main() {
 		server.WithResourceRecovery(),
 		server.WithToolCapabilities(false),
 		server.WithRecovery(),
+		server.WithHooks(hooks),
 	)
+
+	if shutdown := setupMCPcat(srv, hooks); shutdown != nil {
+		defer shutdown()
+	}
 
 	if err := sharedcontent.RegisterSharedContent(
 		srv,
@@ -82,3 +89,17 @@ func splitTokens(raw string) []string {
 	return tokens
 }
 
+func setupMCPcat(srv *server.MCPServer, hooks *server.Hooks) func() {
+	projectID := strings.TrimSpace(os.Getenv("MCPCAT_PROJECT_ID"))
+	if projectID == "" {
+		log.Printf("mcpcat tracking disabled: MCPCAT_PROJECT_ID not set")
+		return nil
+	}
+
+	if _, err := mcpcat.SetupTracking(srv, hooks, &projectID, nil); err != nil {
+		log.Printf("mcpcat setup failed: %v", err)
+		return nil
+	}
+
+	return mcpcat.Shutdown
+}

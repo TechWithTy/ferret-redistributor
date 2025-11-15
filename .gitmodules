@@ -64,8 +64,8 @@
 [submodule "rust/toon-rust"]
 	path = backend/rust/toon-rust
 	url = https://github.com/toon-format/toon-rust
-[submodule "frontend/app"]
-	path = frontend/app
+[submodule "app/app"]
+	path = app/app
 	url = https://github.com/Deal-Scale/postiz-app.git
 [submodule "landing/deal-scale"]
 	path = landing/deal-scale
@@ -73,3 +73,9 @@
 [submodule "typescript/editly"]
 	path = backend/typescript/editly
 	url = https://github.com/Deal-Scale/editly
+[submodule "backend/go/a2a-inspector"]
+	path = backend/go/a2a-inspector
+	url = https://github.com/a2aproject/a2a-inspector.git
+[submodule "backend/go/mcpcat-go-sdk"]
+	path = backend/go/mcpcat-go-sdk
+	url = https://github.com/Deal-Scale/mcpcat-go-sdk.git

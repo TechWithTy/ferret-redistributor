@@ -83,3 +83,4 @@ entities:
       metadata,json,false,"User-defined tags (experiment IDs, variant names)."
       version,string,false,"Optional MagickCore version string."
 
+
