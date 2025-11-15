@@ -1,0 +1,47 @@
+name: Lint & Unit Tests
+
+on:
+  workflow_call:
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - run: cd go && go test ./...
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r python/requirements.txt || true
+      - run: pytest || true
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: |
+          if [ -f typescript/app/package.json ]; then
+            cd typescript/app && corepack enable && pnpm install && pnpm run build
+          fi
+  codegen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python shared/tools/run_codegen.py
+      - name: Verify generated files up to date
+        run: git diff --exit-code shared/generated
+

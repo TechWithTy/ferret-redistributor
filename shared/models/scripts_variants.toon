@@ -1,0 +1,34 @@
+meta:
+  name: Notion Scripts / Variants
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/299e9c25ecb0819ab02efca74143cf19,"Source DB: 🎭 Scripts / Variants (collection://299e9c25-ecb0-81e8-8397-000b541de541)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+entities:
+  NotionRelationRef:
+    fields[3]:
+      - id,string,true,"Target Notion page ID."
+      - title,string,false,"Cached title."
+      - collection_url,string,false,"collection:// identifier."
+
+  ScriptVariant:
+    description: Mirrors the 🎭 Scripts / Variants schema.
+    fields[15]{name,type,required,notes}:
+      variant_id,string,true,"Title 'Variant / Script ID'."
+      script_text,string,false,"Rich text 'Script / Copy Text'."
+      notes,string,false,"Text 'Notes / Context'."
+      created_date,datetime,false,"Date 'Created Date'."
+      creative_assets,array<NotionRelationRef>,false,"Relation 'Creative Asset' (collection://299e9c25-ecb0-81fa-9b05-000b44c3379a)."
+      iterations,array<NotionRelationRef>,false,"Relation 'Linked Iterations' (collection://295e9c25-ecb0-8112-8b41-000b33916f39)."
+      experiments,array<NotionRelationRef>,false,"Relation 'Used In Experiments' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      metadata,json,false,"Optional ingestion metadata."
+      tags,array<string>,false,"Label future classification (e.g., tone, CTA)."
+      created_at,datetime,false,"Ingestion timestamp."
+      updated_at,datetime,false,"Last sync timestamp."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID."
+      author,string,false,"Free-form author credit."
+      language,string,false,"Language code (ISO 639-1)."
+
+

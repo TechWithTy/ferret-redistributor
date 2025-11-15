@@ -1,0 +1,70 @@
+meta:
+  name: Notion Copy Calendar
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/299e9c25ecb081cd8512eaf0bca8e2c7,"Source DB: 🛑 Copy / Calendar? (collection://299e9c25-ecb0-81f2-a590-000b7ca3119b)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+enums:
+  CopyStatus[3]:
+    - not_started
+    - in_progress
+    - done
+  CopyType[2]:
+    - blog
+    - social
+  CopyContentType[7]:
+    - markdown
+    - html
+    - static_image
+    - carousel
+    - ugc
+    - animated_video
+    - ugc_animated
+  CTAStatus[3]:
+    - not_started
+    - in_progress
+    - done
+
+entities:
+  NotionRelationRef:
+    fields[3]:
+      - id,string,true
+      - title,string,false
+      - collection_url,string,false
+
+  NotionUserRef:
+    fields[3]:
+      - id,string,true
+      - name,string,false
+      - email,string,false
+
+  CopyCalendarEntry:
+    description: Mirrors the 🛑 Copy / Calendar? database.
+    fields[24]{name,type,required,notes}:
+      title,string,true,"Title 'Title'."
+      status,CopyStatus,false,"Status property."
+      type,CopyType,false,"Select 'Type'."
+      content_type,CopyContentType,false,"Select 'Content-Type'."
+      hypothesis,string,false,"Text 'Hypothesis'."
+      goal,string,false,"Text 'Goal'."
+      notes,string,false,"Text 'Notes'."
+      hook,string,false,"Select 'Hook' (free-form)."
+      cta,CTAStatus,false,"Select 'CTA'."
+      conclusion_date,datetime,false,"Date 'Conclusion'."
+      experiment,NotionRelationRef,false,"Relation 'Experiment (Relation)' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      platforms,array<NotionRelationRef>,false,"Relation 'Platforms' (collection://299e9c25-ecb0-813a-8496-000b9e6c83bf)."
+      reviewer,NotionUserRef,false,"Person 'Reviewer'."
+      created_time,datetime,true,"Auto property 'Created Date'."
+      created_by,NotionUserRef,false,"Property 'Created by'."
+      files_doc,array<string>,false,"Files from 'Content Doc'."
+      files_csv,array<string>,false,"Files from 'Content CSV'."
+      files_json,array<string>,false,"Files from 'Content JSON'."
+      files_txt,array<string>,false,"Files from 'Content Txt'."
+      post_content_csv,array<string>,false,"Files from 'Post Content (CSV)'."
+      post_links,array<string>,false,"Text 'Post Link(s)' split by newline."
+      analytics_notes,string,false,"Text 'Analytics (Future)'."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID."
+
+

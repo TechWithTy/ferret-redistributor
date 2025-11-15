@@ -1,0 +1,107 @@
+meta:
+  name: Editly Render Spec
+  version: 0.1.0
+  source_repos[1]{path,notes}:
+    backend/typescript/editly,"Vendor workspace powering declarative video renders."
+
+enums:
+  ResizeMode[4]:
+    - contain
+    - contain_blur
+    - cover
+    - stretch
+  TransitionName[7]:
+    - random
+    - directional_left
+    - directional_right
+    - directional_up
+    - directional_down
+    - dummy
+    - gl
+  LayerType[16]:
+    - video
+    - audio
+    - detached_audio
+    - image
+    - image_overlay
+    - title
+    - subtitle
+    - title_background
+    - news_title
+    - slide_in_text
+    - fill_color
+    - radial_gradient
+    - linear_gradient
+    - rainbow_colors
+    - canvas
+    - fabric
+
+entities:
+  EditlyTransitionDefaults:
+    fields[4]{name,type,required,notes}:
+      name,TransitionName,false,"Defaults to random."
+      duration,float,false,"Seconds; default 0.5."
+      audio_in_curve,string,false,"e.g. tri, linear."
+      audio_out_curve,string,false,"e.g. tri, linear."
+
+  EditlyLayer:
+    fields[11]:
+      - type,LayerType,true
+      - path,string,false,"Used by video/audio/image layers."
+      - text,string,false,"For titles/subtitles."
+      - position,string,false,"Predefined positions or custom object (serialized JSON)."
+      - resize_mode,ResizeMode,false
+      - start,float,false,"Seconds into clip."
+      - stop,float,false,"Seconds into clip."
+      - width,float,false,"0-1 relative."
+      - height,float,false,"0-1 relative."
+      - mix_volume,float,false,"For audio/video layers."
+      - extras,json,false,"Layer-type specific payload (GL shader config, canvas code, etc.)."
+
+  EditlyClip:
+    fields[4]:
+      - duration,float,false,"Defaults to global clip duration."
+      - transition,EditlyTransitionDefaults,false,"Override per clip."
+      - layers,array<EditlyLayer>,true
+      - metadata,json,false,"Optional tags (channel/platform IDs, experiment references)."
+
+  EditlyAudioTrack:
+    fields[6]:
+      - path,string,true
+      - mix_volume,float,false,"Default 1."
+      - cut_from,float,false
+      - cut_to,float,false
+      - start,float,false,"Seconds into timeline."
+      - loop,bool,false
+
+  EditlyDefaults:
+    fields[4]:
+      - duration,float,false,"Default clip duration."
+      - transition,EditlyTransitionDefaults,false
+      - layer,json,false,"Global layer defaults (fontPath, etc.)."
+      - layer_type_defaults,json,false,"Per-layer overrides (e.g., fill-color)."
+
+  EditlySpec:
+    description: Canonical TOON mapping of the editly JSON/JSON5 render spec.
+    fields[20]{name,type,required,notes}:
+      out_path,string,false
+      width,int,false,"Pixels."
+      height,int,false,"Pixels; omit to derive from first source."
+      fps,int,false
+      allow_remote_requests,bool,false
+      fast,bool,false,"Preview mode."
+      enable_ffmpeg_log,bool,false
+      verbose,bool,false
+      defaults,EditlyDefaults,false
+      clips,array<EditlyClip>,true
+      audio_tracks,array<EditlyAudioTrack>,false
+      audio_file_path,string,false
+      loop_audio,bool,false
+      keep_source_audio,bool,false
+      clips_audio_volume,float,false
+      output_volume,float,false
+      audio_norm,json,false,"Fields enable, gaussSize, maxGain."
+      custom_output_args,json,false,"Custom ffmpeg params."
+      metadata,json,false,"Arbitrary annotations (experiment IDs, persona tags)."
+      sources_root,string,false,"Base path for relative assets."
+

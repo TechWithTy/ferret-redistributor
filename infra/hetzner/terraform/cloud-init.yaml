@@ -1,0 +1,27 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose
+write_files:
+  - path: /etc/systemd/system/social-scale.service
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Social Scale Stack
+      After=docker.service
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory=/opt/social-scale
+      ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+      ExecStop=/usr/bin/docker compose down
+
+      [Install]
+      WantedBy=multi-user.target
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable social-scale.service
+
+

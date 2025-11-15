@@ -1,0 +1,37 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    GO_VERSION=1.23.2 \
+    NODE_MAJOR=20 \
+    PYTHONUNBUFFERED=1 \
+    SOCIAL_SCALE_ROOT=/workspace
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates git build-essential pkg-config \
+    python3 python3-venv python3-pip \
+    software-properties-common unzip zip \
+    libssl-dev zlib1g-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go
+RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -o /tmp/go.tgz \
+    && tar -C /usr/local -xzf /tmp/go.tgz \
+    && rm /tmp/go.tgz
+
+ENV PATH="/usr/local/go/bin:/root/.cargo/bin:${PATH}"
+
+# Install Rust (non-interactive)
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
+
+# Install global Node tools
+RUN corepack enable && npm install -g pnpm
+
+WORKDIR ${SOCIAL_SCALE_ROOT}
+
+COPY shared/tools ${SOCIAL_SCALE_ROOT}/shared/tools
+RUN chmod +x ${SOCIAL_SCALE_ROOT}/shared/tools/bootstrap_env.sh
+
+CMD ["/bin/bash"]
+

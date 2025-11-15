@@ -1,0 +1,63 @@
+meta:
+  name: Notion Channels
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/299e9c25ecb0813b9dc5c78fb53d8866,"Source DB: 🎭 Channels (collection://299e9c25-ecb0-81a9-80b9-000b3dd8d2f5)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+entities:
+  NotionRelationRef:
+    fields[3]:
+      - id,string,true
+      - title,string,false
+      - collection_url,string,false
+
+  ChannelSpec:
+    description: Simplified representation of the large 🎭 Channels matrix. Numeric fields use floats even when the source stores select labels.
+    fields[38]{name,type,required,notes}:
+      platform_name,string,true,"Title 'Platform Name'."
+      status,string,false,"Status group (to-do, in progress, done, reviewed, finalized)."
+      priority,string,false,"Select 'Priority'."
+      utm_medium,string,false,"Select 'Channel UTM Medium'."
+      utm_source,string,false,"Select 'Channel UTM Source'."
+      utm_content,array<string>,false,"Multi-select 'Channel UTM Content'."
+      utm_term,string,false,"Select 'Channel UTM Term'."
+      character_limit,float,false,"Select 'character limit' (parsed to number when possible)."
+      character_min,float,false,"Select 'character minimum'."
+      above_fold_chars,float,false,"Select 'Above the fold characters'."
+      hashtag_rule,string,false,"Select 'Hash-Tags' (e.g., 3-5)."
+      hashtags_allowed,bool,false,"Select 'Hashtags Allowed'."
+      allow_links_in_caption,bool,false,"Select 'Allow Links In Caption'."
+      allow_auto_comment,bool,false,"Select 'Allow Auto Commnet'."
+      allow_comment_trigger,bool,false,"Select 'Allow Comment Trigger'."
+      allow_comment_reply,bool,false,"Select 'Allow Comment Response \"Sent\"'."
+      allow_comment_dm,bool,false,"Select 'Allow Comment to DM response'."
+      automation_notes,string,false,"Text 'Automation Key Ideas'."
+      avoid_notes,string,false,"Text 'Avoid'."
+      engagement_signals,string,false,"Text 'Engagement Signals'."
+      preferred_post_mix,string,false,"Text 'Preffered Post Mix'."
+      weekday_best_times,string,false,"Text 'Weekdays Best Posting Times - '."
+      weekend_best_times,string,false,"Text ' Weekend Best Posting Times  '."
+      text_guidelines,string,false,"Text 'Text Formatting Guidlines'."
+      image_guidelines,string,false,"Text 'Image Presentation Guidlines'."
+      video_guidelines,string,false,"Text 'Video Pesentation Guidlines'."
+      dimensions,array<string>,false,"Preferred aspect ratios list."
+      file_formats,array<string>,false,"Multi-select 'File Formats Allowed'."
+      min_file_size_kb,float,false,"Select 'Min File Size (KB)'."
+      max_file_size_kb,float,false,"Select 'Max File Size (KB)'."
+      min_video_size_kb,float,false,"Select 'Min Video Size (KB) '."
+      max_video_size_kb,float,false,"Select 'Max Video Size (KB) '."
+      min_files,int,false,"Select 'Min Num Of Files'."
+      max_files,int,false,"Multi-select 'Max Num Of Files' (take max)."
+      video_codec,string,false,"Select 'Video codec'."
+      video_bitrate,string,false,"Select 'Video bitrate (kbps)'."
+      audio_codec,string,false,"Select 'Audio Codec'."
+      audio_bitrate,string,false,"Select 'Audio bitrate (kbps)'."
+      experiments,array<NotionRelationRef>,false,"Relation '🚧 Experiments' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      creative_assets,array<NotionRelationRef>,false,"Relation '🎫 Creative Assets' (collection://299e9c25-ecb0-81fa-9b05-000b44c3379a)."
+      platforms,array<NotionRelationRef>,false,"Relation '🧩Platforms (2 Way)' (collection://299e9c25-ecb0-813a-8496-000b9e6c83bf)."
+      metadata,json,false,"Optional raw Notion payload for rarely used properties."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID."
+
+

@@ -1,0 +1,34 @@
+meta:
+  name: Notion Iterations / Actions
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/295e9c25ecb0816ebd87f774cfb3312e,"Source DB: 🖱️ Iterations / Actions (collection://295e9c25-ecb0-8112-8b41-000b33916f39)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+entities:
+  NotionRelationRef:
+    description: Generic pointer to another Notion row.
+    fields[3]{name,type,required,notes}:
+      id,string,true,"Target Notion page ID."
+      title,string,false,"Cached title text."
+      collection_url,string,false,"collection:// identifier."
+
+  IterationAction:
+    description: Mirrors the 🖱️ Iterations / Actions schema.
+    fields[14]{name,type,required,notes}:
+      iteration_id,string,true,"Title 'Iteration ID'."
+      change_description,string,false,"Text 'Change Description'."
+      reason,string,false,"Text 'Reason / Hypothesis'."
+      post_ad_id,string,false,"Text 'Post / Ad ID'."
+      outcome_notes,string,false,"Text 'Outcome / Notes'."
+      date_of_change,datetime,false,"Date property 'Date of Change'."
+      creative_assets,array<NotionRelationRef>,false,"Relation 'Creative Asset' (collection://299e9c25-ecb0-81fa-9b05-000b44c3379a)."
+      scripts,array<NotionRelationRef>,false,"Relation 'Script / Variant' (collection://299e9c25-ecb0-81e8-8397-000b541de541)."
+      experiments,array<NotionRelationRef>,false,"Backlinked via Experiments relation."
+      metadata,json,false,"Optional ingestion metadata."
+      created_at,datetime,false,"Ingestion timestamp."
+      updated_at,datetime,false,"Last sync timestamp."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID (for dedupe)."
+
+

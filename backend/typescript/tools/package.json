@@ -1,0 +1,19 @@
+{
+  "name": "@ferret/tools",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "video:render": "tsx src/videoEditor.ts"
+  },
+  "dependencies": {
+    "editly": "file:../editly",
+    "json5": "^2.2.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.6.3"
+  }
+}
+
+

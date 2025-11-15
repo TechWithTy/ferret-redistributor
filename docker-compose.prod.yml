@@ -1,0 +1,42 @@
+services:
+  api:
+    image: ghcr.io/deal-scale/social-scale-api:${GIT_SHA:-latest}
+    restart: unless-stopped
+    env_file:
+      - infra/env/prod/api.env
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+
+  python-workers:
+    image: ghcr.io/deal-scale/social-scale-workers:${GIT_SHA:-latest}
+    restart: unless-stopped
+    env_file:
+      - infra/env/prod/workers.env
+
+  frontend:
+    image: ghcr.io/deal-scale/social-scale-frontend:${GIT_SHA:-latest}
+    restart: unless-stopped
+    env_file:
+      - infra/env/prod/frontend.env
+    ports:
+      - "80:3000"
+
+  postgres:
+    image: postgres:15
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
+
+

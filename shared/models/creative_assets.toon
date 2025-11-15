@@ -1,0 +1,55 @@
+meta:
+  name: Notion Creative Assets
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/299e9c25ecb081808164f32b83e31b45,"Source DB: 🎫 Creative Assets (collection://299e9c25-ecb0-81fa-9b05-000b44c3379a)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+enums:
+  AssetType[2]:
+    - carousel
+    - reel
+  AssetFormat[4]:
+    - video
+    - image
+    - text
+    - carousel
+  AssetDimension[4]:
+    - ratio_16_9
+    - ratio_9_16
+    - ratio_4_4
+    - ratio_4_5
+  AssetMedium[1]:
+    - ugc
+
+entities:
+  NotionRelationRef:
+    description: Generic pointer to another Notion database row.
+    fields[3]{name,type,required,notes}:
+      id,string,true,"Target Notion page ID."
+      title,string,false,"Cached display title (if available)."
+      collection_url,string,false,"collection:// identifier for the related database."
+
+  CreativeAsset:
+    description: Mirrors the 🎫 Creative Assets database schema.
+    fields[18]{name,type,required,notes}:
+      creative_id,string,true,"Property 'Creative ID / Name'."
+      asset_type,AssetType,false,"Select 'Asset Type'."
+      format,AssetFormat,false,"Select 'Type / Format'."
+      medium,AssetMedium,false,"Select 'Medium'."
+      dimensions,AssetDimension,false,"Select 'Dimensions'."
+      created_date,datetime,false,"Date 'Created Date'."
+      asset_files,array<string>,false,"Files from 'Asset URL / File'. Store presigned URLs or IDs."
+      caption_files,array<string>,false,"Files from 'Caption ?'."
+      thumbnail_files,array<string>,false,"Files from 'Thumbnail / Preview'."
+      notes,string,false,"Text 'Notes / Variation Info'."
+      experiments,array<NotionRelationRef>,false,"Relation 'Experiments Used In' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      iterations,array<NotionRelationRef>,false,"Relation 'From Iterations' (collection://295e9c25-ecb0-8112-8b41-000b33916f39)."
+      scripts,array<NotionRelationRef>,false,"Relation 'Used In Scripts' (collection://299e9c25-ecb0-81e8-8397-000b541de541)."
+      channels,array<NotionRelationRef>,false,"Backlink via channels DB when assets specify allowed specs."
+      metadata,json,false,"Optional downstream annotations (e.g., storage IDs)."
+      created_at,datetime,false,"System timestamp when ingested."
+      updated_at,datetime,false,"Last sync timestamp."
+      source_url,string,false,"Direct Notion URL for the asset row."
+
+

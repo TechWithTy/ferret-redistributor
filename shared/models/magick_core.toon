@@ -1,0 +1,85 @@
+meta:
+  name: Magick Operation Spec
+  version: 0.1.0
+  source_repos[1]{path,notes}:
+    c/ImageMagick/MagickCore,"Schema derived from ImageMagick MagickCore API (see MagickCore/magick-image.h, magick-property.h)."
+
+enums:
+  Colorspace[9]:
+    - rgb
+    - srgb
+    - cmyk
+    - hsl
+    - hsb
+    - lab
+    - xyz
+    - gray
+    - ycbcr
+  FilterType[8]:
+    - undefined
+    - point
+    - box
+    - triangle
+    - hermite
+    - lanczos
+    - gaussian
+    - catrom
+  CompositeOperator[10]:
+    - over
+    - in
+    - out
+    - atop
+    - xor
+    - plus
+    - minus
+    - multiply
+    - screen
+    - overlay
+
+entities:
+  MagickGeometry:
+    fields[4]{name,type,required,notes}:
+      width,int,false,"Pixels."
+      height,int,false,"Pixels."
+      x_offset,int,false,"Positive/negative offsets allowed."
+      y_offset,int,false
+
+  MagickChannelSettings:
+    fields[3]:
+      - gamma,float,false,"Gamma adjustment per channel."
+      - black_point,float,false
+      - white_point,float,false
+
+  MagickOperation:
+    description: Describes a single MagickCore pipeline step.
+    fields[10]{name,type,required,notes}:
+      op_name,string,true,"E.g., ResizeImage, BlurImage, CompositeImage."
+      geometry,MagickGeometry,false,"Used by resize, crop, extent."
+      radius,float,false,"For blur/sharpen."
+      sigma,float,false,"For blur/sharpen."
+      angle,float,false,"For rotate."
+      filter,FilterType,false
+      composite_operator,CompositeOperator,false,"When op_name is CompositeImage."
+      channel_settings,MagickChannelSettings,false
+      args,json,false,"Free-form map for operation-specific parameters (mask path, color hex, etc.)."
+      metadata,json,false,"Optional tags (source file, notes)."
+
+  MagickPipeline:
+    description: High-level MagickCore job spec.
+    fields[15]{name,type,required,notes}:
+      source_path,string,true,"Input image file."
+      output_path,string,true,"Destination image."
+      colorspace,Colorspace,false,"Target colorspace; defaults to source."
+      depth,int,false,"Bits per channel."
+      density,string,false,"E.g., 300x300 DPI."
+      quality,int,false,"JPEG/WebP quality."
+      background_color,string,false,"Hex or color name."
+      alpha,bool,false,"Enable/disable alpha channel."
+      compression,string,false,"E.g., Zip, RLE, JPEG."
+      operations,array<MagickOperation>,true,"Sequential operations applied to the image."
+      profiles,array<string>,false,"ICC/ICM profiles to attach."
+      artifacts,json,false,"Key-value hints recognized by MagickCore (e.g., verbose flags)."
+      resources,json,false,"Limits for memory, map, disk, thread counts."
+      metadata,json,false,"User-defined tags (experiment IDs, variant names)."
+      version,string,false,"Optional MagickCore version string."
+

@@ -1,0 +1,54 @@
+meta:
+  name: Notion KPI Definitions
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/299e9c25ecb08111b2c4d96bddc6fc54,"Source DB: 🛋️ KPIs / Metric Definitions (collection://299e9c25-ecb0-8130-ac8b-000bb4d93dc0)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+enums:
+  KPIDataSource[4]:
+    - ga4
+    - plausible
+    - linkedin
+    - posthog
+  KPIReportingFrequency[4]:
+    - weekly
+    - monthly
+    - bi_weekly
+    - meta_ads
+
+entities:
+  NotionRelationRef:
+    fields[3]{name,type,required,notes}:
+      id,string,true,"Target Notion page ID."
+      title,string,false,"Cached display title."
+      collection_url,string,false,"collection:// identifier."
+
+  NotionUserRef:
+    fields[3]:
+      - id,string,true,"Notion user ID."
+      - name,string,false,"Display name."
+      - email,string,false,"Optional email address."
+
+  KPIDefinition:
+    description: Mirrors the 🛋️ KPIs / Metric Definitions schema.
+    fields[17]{name,type,required,notes}:
+      kpi_name,string,true,"Title 'KPI Name'."
+      percent_target,float,false,"Number '% Target / Benchmark x'."
+      category,string,false,"Select 'Category'. Maintain curated values externally."
+      data_source,KPIDataSource,false,"Select 'Data Source'."
+      reporting_frequency,KPIReportingFrequency,false,"Select 'Reporting Frequency'."
+      definition,string,false,"Text 'Definition / Formula'."
+      notes,string,false,"Text 'Notes / Context'."
+      responsible,NotionUserRef,false,"Person 'Responsible Person'."
+      platforms,array<NotionRelationRef>,false,"Relation '🧸 Platforms' (collection://299e9c25-ecb0-813a-8496-000b9e6c83bf)."
+      channels,array<NotionRelationRef>,false,"Relation '🧸 Platforms / Channels' (collection://299e9c25-ecb0-813a-8496-000b9e6c83bf)."
+      experiments,array<NotionRelationRef>,false,"Relation 'Experiments Using It' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      metadata,json,false,"Optional ingestion metadata."
+      created_at,datetime,false,"Ingestion timestamp."
+      updated_at,datetime,false,"Last sync timestamp."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID."
+      tags,array<string>,false,"Future multi-select (hook for downstream grouping)."
+
+

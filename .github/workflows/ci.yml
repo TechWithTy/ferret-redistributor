@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  build:
+    needs: lint
+    uses: ./.github/workflows/build.yml
+
+  deploy-hetzner:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy-hetzner.yml
+    secrets: inherit
+
+

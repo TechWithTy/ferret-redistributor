@@ -1,0 +1,51 @@
+meta:
+  name: Notion Platforms
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/299e9c25ecb081b59e41c9e258976fba,"Source DB: 🧸 Platforms (collection://299e9c25-ecb0-813a-8496-000b9e6c83bf)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+enums:
+  PlatformTrafficType[4]:
+    - organic
+    - paid
+    - earned
+    - referral
+
+entities:
+  NotionRelationRef:
+    fields[3]:
+      - id,string,true
+      - title,string,false
+      - collection_url,string,false
+
+  PlatformRecord:
+    description: Mirrors the 🧸 Platforms schema (posting rules per marketing platform).
+    fields[23]{name,type,required,notes}:
+      platform_name,string,true,"Title 'Platform Name'."
+      platform_type,string,false,"Select 'Platform Type'."
+      traffic_type,PlatformTrafficType,false,"Select 'Platform Traffic Type'."
+      utm_medium,string,false,"Select 'Platform UTM Medium'."
+      utm_source,string,false,"Select 'Platform  UTM Source'."
+      utm_content,string,false,"Select 'Platform  UTM Content'."
+      utm_term,string,false,"Select 'Platform  UTM Term'."
+      best_use_case,string,false,"Text 'Best Use Case'."
+      description,string,false,"Text 'Description / Notes'."
+      can_post_programmatically,bool,false,"Select 'Can Post Programmaticlly?'."
+      allows_auto_dm,bool,false,"Select 'Allows Auto DMs'."
+      allows_first_comment,bool,false,"Select 'Allows First Comments?'."
+      post_link_prefix,string,false,"URL 'Post Link prefix'."
+      file_formats,array<string>,false,"Multi-select 'File Formats Allowed'."
+      min_file_size_kb,float,false,"Number 'Min File Size (KB)'."
+      max_file_size_kb,float,false,"Number 'Max File Size (KB)'."
+      min_files,int,false,"Number 'Min Num Of Files'."
+      max_files,array<int>,false,"Multi-select 'Max Num Of Files'."
+      dimensions,array<string>,false,"Relation 'Accepted File Types (Relation type dimentsion size )'."
+      experiments,array<NotionRelationRef>,false,"Relation '🚧 Experiments' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      channels,array<NotionRelationRef>,false,"Relation '🎭  Channels ' (collection://299e9c25-ecb0-81a9-80b9-000b3dd8d2f5)."
+      kpis,array<NotionRelationRef>,false,"Relation '🛋️ KPIs / Metric Definitions' (collection://299e9c25-ecb0-8130-ac8b-000bb4d93dc0)."
+      metadata,json,false,"Optional ingestion metadata."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID."
+
+

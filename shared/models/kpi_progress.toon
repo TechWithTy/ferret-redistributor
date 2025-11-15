@@ -1,0 +1,44 @@
+meta:
+  name: Notion KPI Progress
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/292e9c25ecb080a382d3f7b8aee64f7b,"Source DB: ☃️ KPI Progress (collection://292e9c25-ecb0-81c5-ac1e-000bffb4c64e)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+enums:
+  KPIProgressStatus[1]:
+    - not_started
+
+entities:
+  NotionRelationRef:
+    fields[3]:
+      - id,string,true,"Target Notion page ID."
+      - title,string,false,"Cached title."
+      - collection_url,string,false,"collection:// identifier."
+
+  NotionUserRef:
+    fields[3]:
+      - id,string,true
+      - name,string,false
+      - email,string,false
+
+  KPIProgressEntry:
+    description: Mirrors the ☃️ KPI Progress schema.
+    fields[15]{name,type,required,notes}:
+      kpi_name,string,true,"Title 'KPI Name'."
+      experiment,NotionRelationRef,false,"Relation 'Experiment' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
+      kpi_definition,NotionRelationRef,false,"Relation 'KPI (Relation)' (collection://299e9c25-ecb0-8130-ac8b-000bb4d93dc0)."
+      platforms,array<NotionRelationRef>,false,"Relation '🧸 Platforms' (collection://299e9c25-ecb0-813a-8496-000b9e6c83bf)."
+      current_value,float,false,"Number 'Current Value'."
+      goal,float,false,"Number 'Goal'."
+      status,KPIProgressStatus,false,"Select 'Status'."
+      notes,string,false,"Text 'Notes'."
+      last_updated,datetime,true,"Property 'Last Updated'."
+      last_edited_by,NotionUserRef,false,"Property 'Last edited by'."
+      metadata,json,false,"Optional ingestion metadata."
+      created_at,datetime,false,"Ingestion timestamp."
+      updated_at,datetime,false,"Last sync timestamp."
+      source_url,string,false,"Direct Notion URL."
+      source_id,string,false,"Original Notion UUID."
+
+

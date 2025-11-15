@@ -1,0 +1,72 @@
+meta:
+  name: Notion Experiments Database
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/6be08800e8d54cde93f14c26061f7b79,"Source: 🚧 Experiments database (view://789a620c-30ef-4189-9124-486e9dcd1e60)."
+    shared/models,"TOON specs stored alongside generated contracts."
+
+enums:
+  ExperimentStatus[5]:
+    - proposed
+    - running
+    - completed
+    - abandoned
+    - planning
+  DecisionOutcome[4]:
+    - win
+    - loss
+    - continue
+    - inconclusive
+  GoalType[2]:
+    - awareness
+    - conversion
+  ContentPillar[4]:
+    - educate
+    - entertain
+    - emotion
+    - humor
+  FunnelLocation[4]:
+    - conversion
+    - aquisition
+    - retention
+    - retargeting
+  UniqueContentProposition[2]:
+    - feature_callout # "I called out features"
+    - value_callout # "I called out value"
+
+entities:
+  NotionRelationRef:
+    description: Generic pointer to an external Notion entry captured via relation/rollup.
+    fields[3]{name,type,required,notes}:
+      id,string,true,"Target page ID from the related data source."
+      title,string,false,"Cached display title; Notion may omit for inline relations."
+      collection_url,string,false,"Notion collection:// identifier for the source database."
+
+  ExperimentRecord:
+    description: Mirror of the 🚧 Experiments database row (no rollups currently defined).
+    fields[23]{name,type,required,notes}:
+      experiment_id,string,true,"Maps to title 'Experiment ID'."
+      status,ExperimentStatus,false,"Select column 'Status'."
+      decision,DecisionOutcome,false,"Select column 'Decision'."
+      goal,GoalType,false,"Select column 'Goal'."
+      content_pillar,ContentPillar,false,"Select column 'Content Pillars'."
+      funnel_location,FunnelLocation,false,"Select column 'Funnel Location'."
+      unique_content_proposition,UniqueContentProposition,false,"Select column 'Unique Content Proposition'."
+      hypothesis,string,false,"Long text column 'Hypothesis'."
+      notes,string,false,"Rich text column 'Notes'."
+      notes_learnings,string,false,"Rich text column 'Notes / Learnings'."
+      post_ad_id,string,false,"Text column 'Post / Ad ID'."
+      date_started,datetime,false,"Date property 'Date Started'."
+      date_ended,datetime,false,"Date property 'Date Ended'."
+      creative_assets,array<NotionRelationRef>,false,"Relation 'Creative Asset(s)' (collection://fa66ebc4-c6e3-476a-8a25-27d855dcb042)."
+      actions_iterations,array<NotionRelationRef>,false,"Relation 'Actions / Iterations' (collection://2c07153b-875e-4507-8786-105d41b7af93)."
+      kpis,array<NotionRelationRef>,false,"Relation 'KPI(s)' (collection://972a0bd4-dec7-4840-8115-c2308d05a437)."
+      kpi_progress,array<NotionRelationRef>,false,"Relation '☃️ KPI Progress' (collection://292e9c25-ecb0-81c5-ac1e-000bffb4c64e)."
+      platform_channels,array<NotionRelationRef>,false,"Relation 'Platform / Channel' (collection://a354e7de-78d6-4837-92a0-7e93b8c53cdb)."
+      platforms,array<NotionRelationRef>,false,"Relation '🧸 Platforms' (collection://a354e7de-78d6-4837-92a0-7e93b8c53cdb)."
+      variant_scripts,array<NotionRelationRef>,false,"Relation 'Variant / Script' (collection://7ddad8b4-461d-4ddd-b32f-51f0bb22350f)."
+      channels,array<NotionRelationRef>,false,"Relation '🎭  Channels ' (collection://293e9c25-ecb0-81aa-b625-000b64d3a331)."
+      copy_calendar,array<NotionRelationRef>,false,"Relation '🛑 Copy  / Calendar?' (collection://292e9c25-ecb0-8106-aa0b-000ba7da1da1)."
+      target_personas,array<string>,false,"Multi-select 'Target Persona(s)'; options are user-defined."
+
+

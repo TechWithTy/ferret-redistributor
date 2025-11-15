@@ -1,0 +1,440 @@
+meta:
+  name: Social Scale Core Models
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    go/pkg/models,"Existing Go structs mirrored here"
+    go/pkg/models/rbac.go,"Role + permission enums"
+
+enums:
+  Role[4]:
+    - super_admin
+    - admin
+    - user
+    - viewer
+  Permission[14]:
+    - view_users
+    - create_users
+    - edit_users
+    - delete_users
+    - view_teams
+    - create_teams
+    - edit_teams
+    - delete_teams
+    - view_content
+    - create_content
+    - edit_content
+    - delete_content
+    - view_org_settings
+    - manage_integrations
+  ContentSourceType[4]:
+    - rss
+    - youtube
+    - youtube_video
+    - youtube_playlist
+
+entities:
+  Organization:
+    description: Top-level tenant container.
+    fields[4]{name,type,required,notes}:
+      id,string,true,"Primary ID (UUID)."
+      name,string,true,"Display name."
+      created_at,datetime,true,"UTC timestamp."
+      updated_at,datetime,true,"UTC timestamp."
+
+  User:
+    description: Human or service actor.
+    fields[8]:
+      - id,string,true,"Primary ID."
+      - org_id,string,true,"Owning organization."
+      - email,string,true,"Unique email."
+      - display_name,string,true,"Human-readable name."
+      - role,Role,true,"Global role."
+      - created_at,datetime,true,"UTC timestamp."
+      - updated_at,datetime,true,"UTC timestamp."
+      - metadata,json,false,"Optional flexible payload."
+
+  Team:
+    fields[5]:
+      - id,string,true
+      - org_id,string,true
+      - name,string,true
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  TeamMember:
+    fields[4]:
+      - team_id,string,true
+      - user_id,string,true
+      - role,string,true,"Team-scoped role label."
+      - created_at,datetime,true
+
+  SocialAccount:
+    fields[10]:
+      - id,string,true
+      - org_id,string,true
+      - team_id,string,false,"Optional team assignment."
+      - platform,string,true,"e.g., linkedin, instagram."
+      - handle,string,true
+      - external_id,string,true
+      - auth_kind,string,true,"oauth, service_account, etc."
+      - auth_meta,json,false,"Provider-specific auth bundle."
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  ContentItem:
+    fields[10]:
+      - id,string,true
+      - org_id,string,true
+      - title,string,true
+      - body,string,true
+      - canonical_url,string,true
+      - media_url,string,false
+      - metadata,json,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+      - tags,array<string>,false
+
+  Campaign:
+    fields[6]:
+      - id,string,true
+      - org_id,string,true
+      - name,string,true
+      - description,string,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  ScheduledPost:
+    fields[14]:
+      - id,string,true
+      - org_id,string,true
+      - campaign_id,string,false
+      - content_id,string,false
+      - social_account_id,string,false
+      - platform,string,true
+      - caption,string,false
+      - hashtags,string,false
+      - scheduled_at,datetime,true
+      - status,string,true,"draft,pending,published,failed"
+      - external_id,string,false
+      - published_at,datetime,false
+      - metadata,json,false
+      - created_at,datetime,true
+
+  AIGeneration:
+    fields[12]:
+      - id,string,true
+      - org_id,string,true
+      - user_id,string,false
+      - model,string,true
+      - prompt,string,true
+      - parameters,json,false
+      - output_text,string,true
+      - output_json,json,false
+      - content_item_id,string,false
+      - status,string,true
+      - error_message,string,false
+      - created_at,datetime,true
+
+  AIVariant:
+    fields[6]:
+      - id,string,true
+      - generation_id,string,true
+      - content_item_id,string,false
+      - variant_index,int,true
+      - payload,json,true
+      - created_at,datetime,true
+
+  Experiment:
+    fields[8]:
+      - id,string,true
+      - org_id,string,true
+      - name,string,true
+      - hypothesis,string,true
+      - started_at,datetime,true
+      - ended_at,datetime,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  ExperimentArm:
+    fields[5]:
+      - id,string,true
+      - experiment_id,string,true
+      - variant_id,string,false
+      - weight,float,true
+      - created_at,datetime,true
+
+  PostOutcome:
+    fields[13]:
+      - id,string,true
+      - scheduled_post_id,string,true
+      - platform,string,true
+      - external_id,string,true
+      - impressions,int,true
+      - reach,int,true
+      - likes,int,true
+      - comments,int,true
+      - shares,int,true
+      - clicks,int,true
+      - conversions,int,true
+      - collected_at,datetime,true
+      - metadata,json,false
+
+  TrendMetric:
+    fields[9]:
+      - org_id,string,true
+      - source,string,true
+      - dimension,string,true
+      - metric,string,true
+      - bucket_start,datetime,true
+      - bucket_end,datetime,true
+      - value,float,true
+      - meta,json,false
+      - created_at,datetime,true
+
+  AppMetric:
+    fields[4]:
+      - name,string,true
+      - value,float,true
+      - attributes,map<string,any>,false
+      - recorded_at,datetime,true
+
+  MarketplacePost:
+    fields[11]:
+      - id,string,true
+      - org_id,string,true
+      - seller_user_id,string,true
+      - content_item_id,string,false
+      - title,string,true
+      - description,string,true
+      - price_cents,int,true
+      - currency,string,true
+      - status,string,true
+      - metadata,json,false
+      - updated_at,datetime,true
+
+  MarketplaceTransaction:
+    fields[7]:
+      - id,string,true
+      - post_id,string,true
+      - buyer_user_id,string,true
+      - amount_cents,int,true
+      - currency,string,true
+      - status,string,true
+      - created_at,datetime,true
+
+  AnalyticsEvent:
+    fields[14]:
+      - id,string,true
+      - event_type,string,true
+      - event_value,string,true
+      - session_id,string,true
+      - user_id,string,false
+      - anonymous_id,string,true
+      - referrer,string,false
+      - user_agent,string,false
+      - ip_address,string,false
+      - screen_size,string,false
+      - metadata,json,false
+      - created_at,datetime,true
+
+  ContentAnalytics:
+    fields[10]:
+      - content_id,string,true
+      - view_count,int,true
+      - unique_views,int,true
+      - avg_time_on_page,float,true
+      - bounce_rate,float,true
+      - shares,int,true
+      - likes,int,true
+      - comments,int,true
+      - date,datetime,true
+
+  UserEngagement:
+    fields[6]:
+      - user_id,string,true
+      - session_count,int,true
+      - avg_session_time,float,true
+      - pages_per_session,float,true
+      - last_active_at,datetime,true
+      - total_interactions,int,true
+
+  Funnel:
+    fields[5]:
+      - id,string,true
+      - name,string,true
+      - steps,array<FunnelStep>,true
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  FunnelStep:
+    fields[4]:
+      - name,string,true
+      - url,string,true
+      - order,int,true
+      - required,bool,true
+
+  FunnelResult:
+    fields[6]:
+      - funnel_id,string,true
+      - steps,array<FunnelStepResult>,true
+      - start_date,datetime,true
+      - end_date,datetime,true
+      - total_users,int,true
+      - conversion_rate,float,true
+
+  FunnelStepResult:
+    fields[4]:
+      - step_name,string,true
+      - visitors,int,true
+      - drop_off,int,true
+      - drop_off_rate,float,true
+
+  BusinessExperiment:
+    fields[10]:
+      - id,string,true
+      - name,string,true
+      - hypothesis,string,true
+      - start_date,datetime,true
+      - end_date,datetime,false
+      - status,string,true,"draft,running,completed,paused"
+      - metrics,map<string,any>,false
+      - results,string,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  ValueProposition:
+    fields[10]:
+      - id,string,true
+      - name,string,true
+      - description,string,false
+      - target_segment,string,false
+      - benefits,array<string>,false
+      - metrics,map<string,any>,false
+      - is_active,bool,true
+      - organization_id,string,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  BusinessPartnership:
+    fields[12]:
+      - id,string,true
+      - name,string,true
+      - type,string,true,"integration,reseller,strategic,..."
+      - status,string,true,"prospect,active,inactive"
+      - start_date,datetime,false
+      - end_date,datetime,false
+      - contact_info,map<string,string>,false
+      - terms,string,false
+      - metadata,map<string,any>,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  CostCenter:
+    fields[10]:
+      - id,string,true
+      - name,string,true
+      - description,string,false
+      - budget,float,true
+      - owner_id,string,true
+      - parent_id,string,false
+      - is_active,bool,true
+      - organization_id,string,true
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  CustomerSegment:
+    fields[12]:
+      - id,string,true
+      - name,string,true
+      - description,string,false
+      - criteria,map<string,any>,false
+      - size_estimate,int,false
+      - growth_rate,float,false
+      - ltv,float,false
+      - cac,float,false
+      - is_active,bool,true
+      - organization_id,string,true
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  BusinessModelCanvas:
+    fields[15]:
+      - id,string,true
+      - name,string,true
+      - description,string,false
+      - customer_segments,array<CustomerSegment>,false
+      - value_propositions,array<ValueProposition>,false
+      - channels,array<string>,false
+      - customer_relationships,array<string>,false
+      - revenue_streams,map<string,any>,false
+      - key_resources,array<string>,false
+      - key_activities,array<string>,false
+      - key_partnerships,array<BusinessPartnership>,false
+      - cost_structure,map<string,any>,false
+      - organization_id,string,true
+      - is_active,bool,true
+      - created_at,datetime,true
+
+  ContentSource:
+    fields[12]:
+      - id,string,true
+      - org_id,string,true
+      - team_id,string,false
+      - name,string,true
+      - type,ContentSourceType,true
+      - url,string,true
+      - description,string,false
+      - is_active,bool,true
+      - last_fetched,datetime,false
+      - metadata,map<string,any>,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  ContentSourceItem:
+    fields[15]:
+      - id,string,true
+      - source_id,string,true
+      - org_id,string,true
+      - external_id,string,true
+      - title,string,true
+      - description,string,false
+      - url,string,true
+      - thumbnail_url,string,false
+      - published_at,datetime,false
+      - author,string,false
+      - duration_seconds,int,false
+      - view_count,int,false
+      - metadata,map<string,any>,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  YouTubePlaylist:
+    fields[13]:
+      - id,string,true
+      - org_id,string,true
+      - source_id,string,true
+      - external_id,string,true
+      - title,string,true
+      - description,string,false
+      - thumbnail_url,string,false
+      - item_count,int,true
+      - is_active,bool,true
+      - last_synced_at,datetime,false
+      - metadata,map<string,any>,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+
+  ContentSourceSync:
+    fields[12]:
+      - id,string,true
+      - source_id,string,true
+      - org_id,string,true
+      - status,string,true,"pending,in_progress,completed,failed"
+      - items_fetched,int,true
+      - items_imported,int,true
+      - error,string,false
+      - started_at,datetime,false
+      - completed_at,datetime,false
+      - created_at,datetime,true
+      - updated_at,datetime,true
+

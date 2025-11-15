@@ -1,0 +1,104 @@
+version: "3.9"
+
+services:
+  postiz:
+    image: ghcr.io/gitroomhq/postiz-app:latest
+    container_name: postiz
+    restart: unless-stopped
+    env_file:
+      - postiz.env
+    environment:
+      # Required defaults – override in .env as needed
+      MAIN_URL: ${MAIN_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL:-http://localhost:3000}
+      IS_GENERAL: ${IS_GENERAL:-true}
+      DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-false}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      UPLOAD_DIRECTORY: ${UPLOAD_DIRECTORY:-/uploads}
+      NEXT_PUBLIC_UPLOAD_DIRECTORY: ${NEXT_PUBLIC_UPLOAD_DIRECTORY:-/uploads}
+      NOT_SECURED: ${NOT_SECURED:-false}
+      POSTIZ_APPS: ${POSTIZ_APPS:-""}
+    ports:
+      - "${POSTIZ_PORT:-5000}:5000"
+    volumes:
+      - postiz-config:/config
+      - postiz-uploads:/uploads
+    depends_on:
+      postiz-postgres:
+        condition: service_healthy
+      postiz-redis:
+        condition: service_healthy
+    networks:
+      - postiz-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.postiz.rule=Host(`${POSTIZ_DOMAIN}`)"
+      - "traefik.http.routers.postiz.entrypoints=websecure"
+      - "traefik.http.routers.postiz.tls=true"
+      - "traefik.http.services.postiz.loadbalancer.server.port=5000"
+
+  postiz-postgres:
+    image: postgres:17-alpine
+    container_name: postiz-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postiz}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postiz-password}
+      POSTGRES_DB: ${POSTGRES_DB:-postiz-db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postiz} -d ${POSTGRES_DB:-postiz-db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    networks:
+      - postiz-network
+
+  postiz-redis:
+    image: redis:7.2
+    container_name: postiz-redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postiz-redis-data:/data
+    networks:
+      - postiz-network
+
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - postiz-network
+
+volumes:
+  postgres-volume:
+  postiz-redis-data:
+  postiz-config:
+  postiz-uploads:
+
+networks:
+  postiz-network:
+    name: postiz-network
+
