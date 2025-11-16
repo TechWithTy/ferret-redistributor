@@ -131,3 +131,6 @@ terraform.tfvars
 .gcp/
 .azure/
 .terraform/
+
+# MCP Private Configurations
+shared/mcp/config.private.json

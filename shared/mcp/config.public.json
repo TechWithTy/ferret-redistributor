@@ -1,0 +1,39 @@
+{
+    "mcpServers": {
+        "facebook": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "/path/to/facebook-mcp-server",
+                "run",
+                "facebook-mcp-server"
+            ]
+        },
+        "meta-ads-remote": {
+            "url": "https://mcp.pipeboard.co/meta-ads-mcp"
+        },
+        "instagram": {
+            "command": "python",
+            "args": [
+                "/path/to/ig-mcp/src/instagram_mcp_server.py"
+            ],
+            "env": {
+                "INSTAGRAM_ACCESS_TOKEN": "your_access_token"
+            }
+        },
+        "linkedin": {
+            "command": "docker",
+            "args": [
+                "run",
+                "--rm",
+                "-i",
+                "-e",
+                "LINKEDIN_COOKIE",
+                "stickerdaniel/linkedin-mcp-server:latest"
+            ],
+            "env": {
+                "LINKEDIN_COOKIE": "li_at=YOUR_COOKIE_VALUE"
+            }
+        }
+    }
+}

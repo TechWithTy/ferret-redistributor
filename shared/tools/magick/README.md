@@ -30,3 +30,4 @@ Currently supported operations in the `operations` array:
 Extend `pipeline.py` as needed to cover additional MagickCore operations and keep `shared/models/magick_core.toon` in sync.
 
 
+

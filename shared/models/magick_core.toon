@@ -84,3 +84,4 @@ entities:
       version,string,false,"Optional MagickCore version string."
 
 
+

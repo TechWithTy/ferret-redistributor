@@ -33,3 +33,4 @@ Flags map directly to editly CLI options:
 Agents should populate the `editly.toon` schema, write it to disk (JSON/JSON5), then call this script via MCP tooling.
 
 
+

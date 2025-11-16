@@ -9,6 +9,8 @@ languages or runtimes:
 - `shared/tools/` — scripts, CLIs, and helper configs that orchestrate model
   generation, validation, and external integrations.
 - `shared/prompt/` — reusable POML prompt blueprints for MCP/TUI agents.
+- `shared/mcp/` — cross-language MCP (Model Context Protocol) server configurations.
+  Contains public and private config files for MCP servers used across backend implementations.
 - `shared/resources/` — reference docs, specs, and knowledge base fragments
   that should be exposed read-only to orchestration agents.
 - `shared/generated/` — machine-generated outputs (TypeScript, Go, SQL). This

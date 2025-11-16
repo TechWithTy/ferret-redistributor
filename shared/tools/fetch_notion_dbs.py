@@ -62,6 +62,10 @@ DB_SPECS: Dict[str, Dict[str, str]] = {
         "env": "NOTION_DB_PLATFORMS_ID",
         "default": "299e9c25ecb081b59e41c9e258976fba",
     },
+    "media_edit_tracker": {
+        "env": "NOTION_DB_MEDIA_EDIT_TRACKER_ID",
+        "default": "2ade9c25ecb080c495bbe7c5dbecf0e2",
+    },
 }
 
 
@@ -154,6 +158,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
 
 

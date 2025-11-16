@@ -1,0 +1,83 @@
+meta:
+  name: Notion Media Edit Tracker
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    notion/2ade9c25ecb080c495bbe7c5dbecf0e2,"Source DB: Edits (collection://2ade9c25-ecb0-8023-bd53-000b7d40c9a6)"
+    shared/models,"Generated TOON spec for downstream codegen."
+
+enums:
+  EditType[8]:
+    - single_edit
+    - bulk_edit
+    - automation_generated
+    - auto_revision
+    - ai_generation
+    - ai_revision
+    - manual
+    - manual_revision
+  MediaType[7]:
+    - video
+    - audio
+    - image
+    - gif
+    - thumbnail
+    - article_asset
+    - ad_creative
+  EditPurpose[10]:
+    - seo_fix
+    - branding
+    - branding_update
+    - color_correction
+    - audio_cleanup
+    - caption_rewrite
+    - format_optimization
+    - content_repurpose
+    - compliance_update
+    - performance_optimization
+  EditStatus[3]:
+    - not_started
+    - in_progress
+    - done
+  ImpactScore[10]:
+    - "1"
+    - "2"
+    - "3"
+    - "4"
+    - "5"
+    - "6"
+    - "7"
+    - "8"
+    - "9"
+    - "10"
+
+entities:
+  NotionRelationRef:
+    description: Generic pointer to another Notion database row.
+    fields[3]{name,type,required,notes}:
+      id,string,true,"Target Notion page ID."
+      title,string,false,"Cached display title (if available)."
+      collection_url,string,false,"collection:// identifier for the related database."
+
+  MediaEdit:
+    description: Tracks edits performed on media items, including before/after states, automation triggers, and impact metrics. Mirrors the Edits database schema.
+    fields[20]{name,type,required,notes}:
+      edit_name,string,true,"Title 'Edit Name'."
+      edit_type,array<EditType>,false,"Multi-select 'Edit Type'."
+      media_type,MediaType,false,"Select 'Media Type'."
+      media_items,array<NotionRelationRef>,false,"Relation 'Media Items' to Creative Assets DB (collection://fa66ebc4-c6e3-476a-8a25-27d855dcb042)."
+      edit_description,string,false,"Text 'Edit Description'."
+      before_files,array<string>,false,"File 'Before' state (JSON array of file IDs)."
+      after_files,array<string>,false,"File 'After' state (JSON array of file IDs)."
+      performed_by,string,false,"Person 'Performed By' (user ID)."
+      timestamp,datetime,false,"Date 'Timestamp' when edit was performed."
+      bulk_count,number,false,"Number 'Bulk Count' (for bulk edits)."
+      edit_purpose,EditPurpose,false,"Select 'Edit Purpose'."
+      status,EditStatus,false,"Status 'Status' (Notion status field)."
+      review_notes,string,false,"Text 'Review Notes'."
+      impact_score,ImpactScore,false,"Select 'Impact Score' (1-10 scale as select options)."
+      experiment,array<NotionRelationRef>,false,"Relation 'Experiment' (collection://299e9c25-ecb0-81ba-b990-000bdd0fce2f)."
+      automation_trigger_id,string,false,"Text 'Automation Trigger ID'."
+      metadata,json,false,"Optional downstream annotations."
+      created_at,datetime,false,"System timestamp when ingested."
+      updated_at,datetime,false,"Last sync timestamp."
+      source_url,string,false,"Direct Notion URL for the edit row."

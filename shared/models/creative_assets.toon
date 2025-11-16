@@ -32,7 +32,7 @@ entities:
 
   CreativeAsset:
     description: Mirrors the 🎫 Creative Assets database schema.
-    fields[18]{name,type,required,notes}:
+    fields[19]{name,type,required,notes}:
       creative_id,string,true,"Property 'Creative ID / Name'."
       asset_type,AssetType,false,"Select 'Asset Type'."
       format,AssetFormat,false,"Select 'Type / Format'."
@@ -46,11 +46,13 @@ entities:
       experiments,array<NotionRelationRef>,false,"Relation 'Experiments Used In' (collection://571c5b90-47e3-4630-bc21-52961822797d)."
       iterations,array<NotionRelationRef>,false,"Relation 'From Iterations' (collection://295e9c25-ecb0-8112-8b41-000b33916f39)."
       scripts,array<NotionRelationRef>,false,"Relation 'Used In Scripts' (collection://299e9c25-ecb0-81e8-8397-000b541de541)."
+      edits,array<NotionRelationRef>,false,"Relation 'Edits' to Media Edit Tracker (collection://2ade9c25-ecb0-8023-bd53-000b7d40c9a6)."
       channels,array<NotionRelationRef>,false,"Backlink via channels DB when assets specify allowed specs."
       metadata,json,false,"Optional downstream annotations (e.g., storage IDs)."
       created_at,datetime,false,"System timestamp when ingested."
       updated_at,datetime,false,"Last sync timestamp."
       source_url,string,false,"Direct Notion URL for the asset row."
+
 
 
 
