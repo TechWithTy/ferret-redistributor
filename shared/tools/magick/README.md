@@ -32,3 +32,4 @@ Extend `pipeline.py` as needed to cover additional MagickCore operations and kee
 
 
 
+

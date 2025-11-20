@@ -1,0 +1,229 @@
+meta:
+  name: Postiz MCP Data Types
+  version: 0.1.0
+  source_repos[2]{path,notes}:
+    shared/mcp/_docs/postiz-mcp.md,"Postiz MCP server documentation and API reference."
+    shared/models,"Generated TOON spec for Postiz MCP integration and codegen."
+
+enums:
+  PostizPlatform[8]:
+    - twitter
+    - linkedin
+    - facebook
+    - instagram
+    - whatsapp
+    - tiktok
+    - pinterest
+    - youtube
+
+  PostStatus[6]:
+    - draft
+    - scheduled
+    - published
+    - failed
+    - cancelled
+    - deleted
+
+  PostContentType[5]:
+    - text
+    - image
+    - video
+    - carousel
+    - story
+
+  CampaignStatus[5]:
+    - planning
+    - active
+    - paused
+    - completed
+    - cancelled
+
+  ConnectionStatus[3]:
+    - connected
+    - disconnected
+    - error
+
+  MediaType[4]:
+    - image
+    - video
+    - gif
+    - document
+
+entities:
+  NotionRelationRef:
+    description: Generic pointer to an external Notion entry captured via relation/rollup.
+    fields[3]{name,type,required,notes}:
+      id,string,true,"Target page ID from the related data source."
+      title,string,false,"Cached display title; Notion may omit for inline relations."
+      collection_url,string,false,"Notion collection:// identifier for the source database."
+
+  PostizMedia:
+    description: Media attachment for Postiz posts (images, videos, documents).
+    fields[10]{name,type,required,notes}:
+      media_id,string,false,"Postiz media ID after upload."
+      media_type,MediaType,true,"Type of media (image, video, gif, document)."
+      url,string,true,"URL to media file (local path or remote URL)."
+      thumbnail_url,string,false,"Thumbnail URL for video/media preview."
+      file_size_kb,float,false,"File size in kilobytes."
+      width,int,false,"Media width in pixels (for images/videos)."
+      height,int,false,"Media height in pixels (for images/videos)."
+      duration_seconds,float,false,"Duration in seconds (for videos)."
+      mime_type,string,false,"MIME type of the media file."
+      alt_text,string,false,"Alt text for accessibility."
+
+  PostizPostContent:
+    description: Content structure for a Postiz post including text, media, and metadata.
+    fields[12]{name,type,required,notes}:
+      text,string,true,"Post text/caption content."
+      hashtags,array<string>,false,"Array of hashtags (without # prefix)."
+      mentions,array<string>,false,"Array of user mentions (without @ prefix)."
+      links,array<string>,false,"Array of URLs to include in post."
+      media,array<PostizMedia>,false,"Media attachments for the post."
+      content_type,PostContentType,false,"Type of post content (text, image, video, carousel, story)."
+      first_comment,string,false,"First comment text (for platforms that support it)."
+      location,string,false,"Location tag/name for the post."
+      cta_text,string,false,"Call-to-action text."
+      cta_url,string,false,"Call-to-action URL."
+      platform_specific_data,json,false,"Platform-specific fields (e.g., Instagram carousel order)."
+
+  PostizSchedule:
+    description: Scheduling information for Postiz posts.
+    fields[8]{name,type,required,notes}:
+      scheduled_at,datetime,true,"Scheduled publication date and time (UTC)."
+      timezone,string,false,"Timezone for scheduling (default: UTC)."
+      is_recurring,bool,false,"Whether this is a recurring post."
+      recurrence_frequency,string,false,"Recurrence frequency (daily, weekly, monthly) if recurring."
+      recurrence_end_date,datetime,false,"End date for recurring posts."
+      optimal_time,bool,false,"Whether to use optimal posting time based on analytics."
+      delay_seconds,int,false,"Delay in seconds for staggered multi-platform posting."
+
+  PostizPost:
+    description: Complete Postiz post definition with content, scheduling, and tracking.
+    fields[20]{name,type,required,notes}:
+      post_id,string,false,"Postiz post ID (assigned after creation)."
+      platform,PostizPlatform,true,"Target platform for the post."
+      content,PostizPostContent,true,"Post content structure."
+      schedule,PostizSchedule,false,"Scheduling information (required for scheduled posts)."
+      status,PostStatus,false,"Current status of the post."
+      account_id,string,false,"Postiz account ID for the platform."
+      account_name,string,false,"Display name of the connected account."
+      experiment_ref,NotionRelationRef,false,"Link to Experiments database entry."
+      creative_asset_ref,NotionRelationRef,false,"Link to Creative Assets database entry."
+      copy_calendar_ref,NotionRelationRef,false,"Link to Copy Calendar database entry."
+      campaign_id,string,false,"Campaign ID if part of a campaign."
+      variant_group,string,false,"A/B test variant group identifier."
+      published_at,datetime,false,"Actual publication timestamp."
+      created_at,datetime,false,"Post creation timestamp."
+      updated_at,datetime,false,"Last update timestamp."
+      error_message,string,false,"Error message if post failed."
+      metadata,json,false,"Additional metadata and custom fields."
+
+  PostizCampaign:
+    description: Postiz campaign structure for coordinated multi-post campaigns.
+    fields[16]{name,type,required,notes}:
+      campaign_id,string,false,"Postiz campaign ID (assigned after creation)."
+      campaign_name,string,true,"Campaign name/title."
+      description,string,false,"Campaign description."
+      status,CampaignStatus,false,"Current campaign status."
+      start_date,datetime,false,"Campaign start date."
+      end_date,datetime,false,"Campaign end date."
+      goal,string,false,"Campaign goal/objective."
+      experiment_ref,NotionRelationRef,false,"Link to Experiments database entry."
+      posts,array<PostizPost>,false,"Posts included in the campaign."
+      variant_groups,array<string>,false,"A/B test variant group identifiers."
+      kpi_refs,array<NotionRelationRef>,false,"Links to KPI Definitions for tracking."
+      created_at,datetime,false,"Campaign creation timestamp."
+      updated_at,datetime,false,"Last update timestamp."
+      metadata,json,false,"Additional campaign metadata."
+
+  PostizMetrics:
+    description: Performance metrics for Postiz posts and campaigns.
+    fields[18]{name,type,required,notes}:
+      post_id,string,true,"Postiz post ID."
+      platform,PostizPlatform,true,"Platform where post was published."
+      impressions,int,false,"Number of impressions/views."
+      reach,int,false,"Number of unique users reached."
+      likes,int,false,"Number of likes/reactions."
+      shares,int,false,"Number of shares/retweets."
+      comments,int,false,"Number of comments."
+      saves,int,false,"Number of saves/bookmarks (platform-dependent)."
+      clicks,int,false,"Number of link clicks."
+      profile_clicks,int,false,"Number of profile clicks."
+      engagement_rate,float,false,"Engagement rate (calculated: (likes+shares+comments)/reach)."
+      click_through_rate,float,false,"Click-through rate (clicks/impressions)."
+      video_views,int,false,"Video views (for video posts)."
+      video_completion_rate,float,false,"Video completion rate (for video posts)."
+      collected_at,datetime,false,"Timestamp when metrics were collected."
+      metadata,json,false,"Platform-specific metrics and additional data."
+
+  PostizAccount:
+    description: Connected social media account information in Postiz.
+    fields[10]{name,type,required,notes}:
+      account_id,string,true,"Postiz account ID."
+      platform,PostizPlatform,true,"Social media platform."
+      account_name,string,true,"Display name of the account."
+      username,string,false,"Platform username/handle."
+      profile_url,string,false,"Profile URL on the platform."
+      is_active,bool,false,"Whether the account is active and connected."
+      connection_status,ConnectionStatus,false,"Current connection status."
+      last_sync_at,datetime,false,"Last synchronization timestamp."
+      permissions,array<string>,false,"Available permissions/capabilities for the account."
+      metadata,json,false,"Additional account metadata."
+
+  PostizConnection:
+    description: Postiz MCP server connection status and configuration.
+    fields[10]{name,type,required,notes}:
+      server_url,string,true,"Postiz MCP server URL (local or remote)."
+      connection_status,ConnectionStatus,true,"Current connection status."
+      is_authenticated,bool,false,"Whether authentication was successful."
+      api_key_present,bool,false,"Whether API key is configured."
+      available_platforms,array<PostizPlatform>,false,"List of available platforms."
+      connected_accounts,array<PostizAccount>,false,"List of connected social media accounts."
+      server_version,string,false,"Postiz MCP server version."
+      last_health_check,datetime,false,"Last health check timestamp."
+      error_message,string,false,"Error message if connection failed."
+      metadata,json,false,"Additional connection metadata."
+
+  PostizContentTemplate:
+    description: Reusable content template for Postiz posts.
+    fields[12]{name,type,required,notes}:
+      template_id,string,false,"Template ID (assigned after creation)."
+      template_name,string,true,"Template name/title."
+      description,string,false,"Template description."
+      platform,PostizPlatform,false,"Target platform (null for multi-platform templates)."
+      content_structure,PostizPostContent,true,"Template content structure with placeholders."
+      tags,array<string>,false,"Template tags for categorization (e.g., content_pillar, persona)."
+      experiment_ref,NotionRelationRef,false,"Link to Experiments database if template-specific."
+      usage_count,int,false,"Number of times template has been used."
+      created_at,datetime,false,"Template creation timestamp."
+      updated_at,datetime,false,"Last update timestamp."
+      metadata,json,false,"Additional template metadata."
+
+  PostizABTestVariant:
+    description: A/B test variant configuration for Postiz campaigns.
+    fields[10]{name,type,required,notes}:
+      variant_id,string,true,"Variant identifier (e.g., 'control', 'variant_a')."
+      variant_name,string,true,"Variant display name."
+      posts,array<PostizPost>,true,"Posts assigned to this variant."
+      kpi_ref,NotionRelationRef,false,"Link to KPI Definition for variant tracking."
+      target_audience,string,false,"Target audience description for variant."
+      allocation_percentage,float,false,"Percentage of audience allocated to this variant (0-100)."
+      start_date,datetime,false,"Variant start date."
+      end_date,datetime,false,"Variant end date."
+      metadata,json,false,"Additional variant metadata."
+
+  PostizAnalyticsReport:
+    description: Comprehensive analytics report for Postiz posts or campaigns.
+    fields[12]{name,type,required,notes}:
+      report_id,string,false,"Report ID (assigned after generation)."
+      report_type,string,true,"Report type (post, campaign, platform, date_range)."
+      start_date,datetime,false,"Report start date."
+      end_date,datetime,false,"Report end date."
+      posts,array<PostizPost>,false,"Posts included in the report."
+      metrics,array<PostizMetrics>,false,"Aggregated metrics for the report."
+      campaign_ref,NotionRelationRef,false,"Link to campaign if report is campaign-specific."
+      experiment_ref,NotionRelationRef,false,"Link to experiment if report is experiment-specific."
+      insights,array<string>,false,"Key insights and recommendations from the report."
+      generated_at,datetime,false,"Report generation timestamp."
+      metadata,json,false,"Additional report metadata."
+

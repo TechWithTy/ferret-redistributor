@@ -16,3 +16,28 @@ hand-maintained structs.
 > Until automated codegen is wired up, teams can reference the `.toon` file
 > directly to keep implementations consistent.
 
+## Model Files
+
+### Notion Database Models
+- `experiments_db.toon` - Experiments database schema
+- `creative_assets.toon` - Creative Assets database schema
+- `copy_calendar.toon` - Copy Calendar database schema
+- `channels.toon` - Channels database schema
+- `platforms.toon` - Platforms database schema
+- `kpi_definitions.toon` - KPI Definitions database schema
+- `kpi_progress.toon` - KPI Progress database schema
+- `iterations_actions.toon` - Iterations/Actions database schema
+- `scripts_variants.toon` - Scripts/Variants database schema
+
+### Integration Models
+- `postiz.toon` - Postiz MCP server data types for social media management
+  - Post content, scheduling, campaigns, analytics, and connection management
+  - Used by Postiz MCP prompts in `shared/prompt/experiments/sub_actions/postiz/`
+  - See `shared/mcp/_docs/postiz-mcp.md` for API documentation
+
+### Core Models
+- `social_scale_core.toon` - Core social scale functionality models
+- `magick_core.toon` - ImageMagick core operations
+- `editly.toon` - Editly video editing models
+- `media_edit_tracker.toon` - Media editing tracking
+
