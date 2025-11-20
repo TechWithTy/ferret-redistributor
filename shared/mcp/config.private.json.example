@@ -36,6 +36,12 @@
       "env": {
         "LINKEDIN_COOKIE": "li_at=YOUR_COOKIE_VALUE"
       }
+    },
+    "postiz": {
+      "url": "http://localhost:3084/sse"
+    },
+    "postiz-remote": {
+      "url": "https://your-postiz-instance.com/mcp/sse?api_key=YOUR_POSTIZ_API_KEY"
     }
   }
 }

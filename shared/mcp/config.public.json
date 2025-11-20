@@ -34,6 +34,9 @@
             "env": {
                 "LINKEDIN_COOKIE": "li_at=YOUR_COOKIE_VALUE"
             }
+        },
+        "postiz": {
+            "url": "http://localhost:3084/sse"
         }
     }
 }
