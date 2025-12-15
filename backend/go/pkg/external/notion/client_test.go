@@ -40,6 +40,30 @@ func TestClient_QueryFirstByTitle_UsesDataSourcesEndpointAndVersionHeader(t *tes
 	require.Equal(t, "p1", p.ID)
 }
 
+func TestClient_QueryPageRefsByTitle_BuildsIndex(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, "/v1/data_sources/ds1/query", r.URL.Path)
+		_, _ = w.Write([]byte(`{
+  "results": [
+    {"id":"p1","url":"u1","properties":{"Group ID":{"type":"title","title":[{"plain_text":"g1"}]}}},
+    {"id":"p2","url":"u2","properties":{"Group ID":{"type":"title","title":[{"plain_text":"g2"}]}}}
+  ],
+  "has_more": false,
+  "next_cursor": null
+}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	c, err := notion.New(notion.Config{APIKey: "ntn_test", BaseURL: srv.URL + "/v1"})
+	require.NoError(t, err)
+
+	m, err := c.QueryPageRefsByTitle(context.Background(), "ds1", "Group ID")
+	require.NoError(t, err)
+	require.Equal(t, "p1", m["g1"].ID)
+	require.Equal(t, "p2", m["g2"].ID)
+}
+
 func TestClient_CreatePageInDataSource_ParentUsesDataSourceID(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

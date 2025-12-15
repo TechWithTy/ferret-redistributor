@@ -74,54 +74,56 @@ type apiEnvelope[T any] struct {
 }
 
 func (c *UserClient) ListGroups(ctx context.Context) ([]Group, error) {
-	u := c.baseURL + "/groups"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, withToken(u, c.token), nil)
+	items, err := listPaged[Group](ctx, c.hc, c.baseURL, c.token, "/groups")
 	if err != nil {
-		return nil, err
-	}
-	res, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, fmt.Errorf("groupme: list groups: %s", res.Status)
-	}
-	var out apiEnvelope[[]Group]
-	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
 		return nil, err
 	}
 	// Normalize members_count if missing
-	for i := range out.Response {
-		if out.Response[i].MembersCount == 0 && len(out.Response[i].Members) > 0 {
-			out.Response[i].MembersCount = len(out.Response[i].Members)
+	for i := range items {
+		if items[i].MembersCount == 0 && len(items[i].Members) > 0 {
+			items[i].MembersCount = len(items[i].Members)
 		}
 	}
-	return out.Response, nil
+	return items, nil
 }
 
 func (c *UserClient) ListBots(ctx context.Context) ([]Bot, error) {
-	u := c.baseURL + "/bots"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, withToken(u, c.token), nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, fmt.Errorf("groupme: list bots: %s", res.Status)
-	}
-	var out apiEnvelope[[]Bot]
-	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
-		return nil, err
-	}
-	return out.Response, nil
+	return listPaged[Bot](ctx, c.hc, c.baseURL, c.token, "/bots")
 }
 
-func withToken(rawURL, token string) string {
+func listPaged[T any](ctx context.Context, hc *http.Client, baseURL, token, path string) ([]T, error) {
+	const perPage = 100
+	out := make([]T, 0, 128)
+	for page := 1; page < 10_000; page++ { // safety cap
+		u := strings.TrimRight(baseURL, "/") + path
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, withTokenAndPaging(u, token, page, perPage), nil)
+		if err != nil {
+			return nil, err
+		}
+		res, err := hc.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		var env apiEnvelope[[]T]
+		if res.StatusCode < 200 || res.StatusCode >= 300 {
+			_ = res.Body.Close()
+			return nil, fmt.Errorf("groupme: %s: %s", strings.TrimPrefix(path, "/"), res.Status)
+		}
+		if err := json.NewDecoder(res.Body).Decode(&env); err != nil {
+			_ = res.Body.Close()
+			return nil, err
+		}
+		_ = res.Body.Close()
+
+		if len(env.Response) == 0 {
+			break
+		}
+		out = append(out, env.Response...)
+	}
+	return out, nil
+}
+
+func withTokenAndPaging(rawURL, token string, page, perPage int) string {
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return rawURL
@@ -129,6 +131,12 @@ func withToken(rawURL, token string) string {
 	q := u.Query()
 	if q.Get("token") == "" {
 		q.Set("token", token)
+	}
+	if q.Get("page") == "" && page > 0 {
+		q.Set("page", fmt.Sprintf("%d", page))
+	}
+	if q.Get("per_page") == "" && perPage > 0 {
+		q.Set("per_page", fmt.Sprintf("%d", perPage))
 	}
 	u.RawQuery = q.Encode()
 	return u.String()

@@ -51,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	nc, err := notion.New(notion.Config{APIKey: notionKey})
+	nc, err := notion.New(notion.Config{APIKey: notionKey, HTTPTimeout: 60 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,8 +68,22 @@ func main() {
 	log.Printf("groupme: %d groups, %d bots fetched", len(groups), len(bots))
 	log.Printf("mode: %s", ternary(*apply, "APPLY", "DRY-RUN"))
 
+	// Load existing Notion pages once (avoid per-item query).
+	existingGroups, err := nc.QueryPageRefsByTitle(ctx, dsGroups, "Group ID")
+	if err != nil {
+		log.Fatalf("failed to load Notion Groups index: %v", err)
+	}
+	existingBots, err := nc.QueryPageRefsByTitle(ctx, dsBots, "Bot ID")
+	if err != nil {
+		log.Fatalf("failed to load Notion Bots index: %v", err)
+	}
+
 	// 1) Upsert groups first, build map group_id -> notion page id
-	groupPageIDByGroupID := make(map[string]string, len(groups))
+	groupPageIDByGroupID := make(map[string]string, len(existingGroups)+len(groups))
+	for gid, ref := range existingGroups {
+		groupPageIDByGroupID[gid] = ref.ID
+	}
+
 	for _, g := range groups {
 		props := map[string]any{
 			"Group ID":      notion.Title(g.ID),
@@ -84,14 +98,27 @@ func main() {
 		if g.UpdatedAt > 0 {
 			props["Last Activity"] = notion.DateTime(time.Unix(g.UpdatedAt, 0))
 		}
-
-		page, err := upsertByTitle(ctx, nc, dsGroups, "Group ID", g.ID, props, *apply)
+		if ref, ok := existingGroups[g.ID]; ok && strings.TrimSpace(ref.ID) != "" {
+			if !*apply {
+				log.Printf("[dry-run] update Group ID=%s page_id=%s", g.ID, ref.ID)
+			} else {
+				if err := nc.UpdatePageProperties(ctx, ref.ID, props); err != nil {
+					log.Fatalf("groups upsert failed (group_id=%s): %v", g.ID, err)
+				}
+				log.Printf("[update] Group ID=%s page_id=%s", g.ID, ref.ID)
+			}
+			continue
+		}
+		if !*apply {
+			log.Printf("[dry-run] create Group ID=%s", g.ID)
+			continue
+		}
+		created, err := nc.CreatePageInDataSource(ctx, dsGroups, props)
 		if err != nil {
 			log.Fatalf("groups upsert failed (group_id=%s): %v", g.ID, err)
 		}
-		if page != nil {
-			groupPageIDByGroupID[g.ID] = page.ID
-		}
+		groupPageIDByGroupID[g.ID] = created.ID
+		log.Printf("[create] Group ID=%s page_id=%s", g.ID, created.ID)
 	}
 
 	// 2) Upsert bots, link to group relation if possible
@@ -119,54 +146,29 @@ func main() {
 				props["Group Relation"] = notion.Relation(pid)
 			}
 		}
-
-		if _, err := upsertByTitle(ctx, nc, dsBots, "Bot ID", b.BotID, props, *apply); err != nil {
+		if ref, ok := existingBots[b.BotID]; ok && strings.TrimSpace(ref.ID) != "" {
+			if !*apply {
+				log.Printf("[dry-run] update Bot ID=%s page_id=%s", b.BotID, ref.ID)
+			} else {
+				if err := nc.UpdatePageProperties(ctx, ref.ID, props); err != nil {
+					log.Fatalf("bots upsert failed (bot_id=%s): %v", b.BotID, err)
+				}
+				log.Printf("[update] Bot ID=%s page_id=%s", b.BotID, ref.ID)
+			}
+			continue
+		}
+		if !*apply {
+			log.Printf("[dry-run] create Bot ID=%s", b.BotID)
+			continue
+		}
+		created, err := nc.CreatePageInDataSource(ctx, dsBots, props)
+		if err != nil {
 			log.Fatalf("bots upsert failed (bot_id=%s): %v", b.BotID, err)
 		}
+		log.Printf("[create] Bot ID=%s page_id=%s", b.BotID, created.ID)
 	}
 
 	log.Printf("done")
-}
-
-func upsertByTitle(ctx context.Context, c *notion.Client, dataSourceID, titleProp, titleValue string, props map[string]any, apply bool) (*struct {
-	ID  string
-	URL string
-}, error) {
-	existing, err := c.QueryFirstByTitle(ctx, dataSourceID, titleProp, titleValue)
-	if err != nil {
-		return nil, err
-	}
-	if existing == nil {
-		if !apply {
-			log.Printf("[dry-run] create %s=%s", titleProp, titleValue)
-			return nil, nil
-		}
-		created, err := c.CreatePageInDataSource(ctx, dataSourceID, props)
-		if err != nil {
-			return nil, err
-		}
-		log.Printf("[create] %s=%s page_id=%s", titleProp, titleValue, created.ID)
-		return &struct {
-			ID  string
-			URL string
-		}{ID: created.ID, URL: created.URL}, nil
-	}
-
-	if !apply {
-		log.Printf("[dry-run] update %s=%s page_id=%s", titleProp, titleValue, existing.ID)
-		return &struct {
-			ID  string
-			URL string
-		}{ID: existing.ID, URL: existing.URL}, nil
-	}
-	if err := c.UpdatePageProperties(ctx, existing.ID, props); err != nil {
-		return nil, err
-	}
-	log.Printf("[update] %s=%s page_id=%s", titleProp, titleValue, existing.ID)
-	return &struct {
-		ID  string
-		URL string
-	}{ID: existing.ID, URL: existing.URL}, nil
 }
 
 func getenvAny(keys ...string) string {
