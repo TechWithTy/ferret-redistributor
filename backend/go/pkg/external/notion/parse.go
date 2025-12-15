@@ -43,6 +43,44 @@ func SelectName(props map[string]propertyValue, propName string) string {
 	return strings.TrimSpace(p.Select.Name)
 }
 
+func RichTextPlainText(props map[string]propertyValue, propName string) string {
+	if props == nil {
+		return ""
+	}
+	p, ok := props[propName]
+	if !ok {
+		return ""
+	}
+	if strings.ToLower(strings.TrimSpace(p.Type)) != "rich_text" {
+		return ""
+	}
+	var b strings.Builder
+	for _, rt := range p.RichText {
+		if strings.TrimSpace(rt.PlainText) == "" {
+			continue
+		}
+		b.WriteString(rt.PlainText)
+	}
+	return strings.TrimSpace(b.String())
+}
+
+func CheckboxValue(props map[string]propertyValue, propName string) (bool, bool) {
+	if props == nil {
+		return false, false
+	}
+	p, ok := props[propName]
+	if !ok {
+		return false, false
+	}
+	if strings.ToLower(strings.TrimSpace(p.Type)) != "checkbox" {
+		return false, false
+	}
+	if p.Checkbox == nil {
+		return false, false
+	}
+	return *p.Checkbox, true
+}
+
 func NumberValue(props map[string]propertyValue, propName string) (float64, bool) {
 	if props == nil {
 		return 0, false

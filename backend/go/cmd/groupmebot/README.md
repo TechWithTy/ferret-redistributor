@@ -67,3 +67,32 @@ curl -i -X POST "http://localhost:8081/groupme/send?token=$GROUPME_WEBHOOK_TOKEN
 - This harness intentionally uses a **shared secret** because GroupMe bot callbacks are not consistently documented as providing a verifiable signature header.
 - The webhook handler ignores `sender_type=bot` (and `system=true`) to avoid reply loops.
 
+## Scheduled posts (Send Now + recurring)
+
+This repo reuses the existing Notion **🚁 Bot Message Logs** database as a lightweight “outbox”:
+
+- To **send now**: create/edit a row with:
+  - `Bot` relation set (points to the bot in the Bots DB)
+  - `Message Text` set
+  - check `Send Now`
+- To **schedule recurring**:
+  - set `Message Text`
+  - set `Bot`
+  - check `Schedule Enabled`
+  - set `Recurrence` to one of: `Daily`, `Every 7 days`, `Every 2 weeks`, `Monthly`
+  - set `Next Run At` to the first date+time you want it to send
+
+### Run the scheduler (for n8n Cron)
+
+Call this endpoint (protected by `GROUPME_WEBHOOK_TOKEN`):
+
+```bash
+curl -i -X POST "http://localhost:8081/groupme/schedule/run?token=$GROUPME_WEBHOOK_TOKEN"
+```
+
+In n8n: **Cron** node → **HTTP Request** node (POST) to the same URL (your tunnel/public host if needed).
+
+Suggested Cron frequencies:
+- `Send Now` usage: every 1–5 minutes
+- Recurrence usage: every 1–15 minutes (depending on how strict you need the send time)
+

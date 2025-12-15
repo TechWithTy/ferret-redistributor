@@ -8,7 +8,7 @@ import (
 
 // QueryAllPages runs a Notion data source query and returns all matching pages (paginated).
 // req is the raw Notion query body (filter/sorts/page_size/start_cursor).
-func (c *Client) QueryAllPages(ctx context.Context, dataSourceID string, req map[string]any) ([]pageObject, error) {
+func (c *Client) QueryAllPages(ctx context.Context, dataSourceID string, req map[string]any) ([]PageObject, error) {
 	ds := strings.TrimSpace(dataSourceID)
 	if ds == "" {
 		return nil, fmt.Errorf("notion: missing data_source_id")
@@ -22,7 +22,7 @@ func (c *Client) QueryAllPages(ctx context.Context, dataSourceID string, req map
 		req["page_size"] = 100
 	}
 
-	var out []pageObject
+	var out []PageObject
 	startCursor := ""
 	for page := 0; page < 10_000; page++ { // safety cap
 		if startCursor != "" {

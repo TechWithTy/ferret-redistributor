@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -38,6 +39,19 @@ type notionMessageLogger struct {
 	groupPageIDByGroupID map[string]string
 }
 
+type scheduler struct {
+	enabled bool
+
+	nc *notion.Client
+	gm *groupme.Client
+
+	dsBots string
+	dsLogs string
+
+	mu        sync.RWMutex
+	botIDByPageID map[string]string
+}
+
 func main() {
 	// Load .env if present (local-only). Non-fatal to keep parity with other cmds.
 	if err := godotenv.Load(); err != nil {
@@ -68,6 +82,13 @@ func main() {
 		log.Printf("notion logging enabled: Bot Message Logs=%s", nlog.dsLogs)
 	} else {
 		log.Printf("notion logging disabled (set NOTION_API_KEY + NOTION_DATA_SOURCE_ID_BOT_MESSAGE_LOGS to enable)")
+	}
+
+	sched := newScheduler(client)
+	if sched.enabled {
+		log.Printf("scheduler enabled (Notion): logs=%s", sched.dsLogs)
+	} else {
+		log.Printf("scheduler disabled (set NOTION_API_KEY + NOTION_DATA_SOURCE_ID_BOT_MESSAGE_LOGS + NOTION_DATA_SOURCE_ID_BOTS)")
 	}
 
 	r.GET("/healthz", func(c *gin.Context) {
@@ -154,10 +175,36 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "sent"})
 	})
 
+	// Run scheduled posts once (protected by the same shared secret).
+	// Intended for n8n Cron → HTTP request.
+	r.POST("/groupme/schedule/run", func(c *gin.Context) {
+		if !isAuthorized(c.Request, token) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+		if !sched.enabled {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "scheduler disabled (missing Notion env vars)"})
+			return
+		}
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 60*time.Second)
+		defer cancel()
+		res, err := sched.runOnce(ctx)
+		if err != nil {
+			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"processed": res.Processed,
+			"sent":      res.Sent,
+			"errors":    res.Errors,
+		})
+	})
+
 	addr := ":" + port
 	log.Printf("groupmebot listening on %s", addr)
 	log.Printf("webhook endpoint: POST http://localhost%s/webhooks/groupme", addr)
 	log.Printf("send endpoint:    POST http://localhost%s/groupme/send", addr)
+	log.Printf("schedule endpoint: POST http://localhost%s/groupme/schedule/run", addr)
 	if err := r.Run(addr); err != nil {
 		log.Fatal(err)
 	}
@@ -340,4 +387,167 @@ func getenvAny(keys ...string) string {
 		}
 	}
 	return ""
+}
+
+func newScheduler(gm *groupme.Client) *scheduler {
+	key := strings.TrimSpace(getenvAny("NOTION_API_KEY", "NOTION_TOKEN", "NOTION_KEY"))
+	dsLogs := strings.TrimSpace(os.Getenv("NOTION_DATA_SOURCE_ID_BOT_MESSAGE_LOGS"))
+	dsBots := strings.TrimSpace(os.Getenv("NOTION_DATA_SOURCE_ID_BOTS"))
+	if key == "" || dsLogs == "" || dsBots == "" || gm == nil {
+		return &scheduler{enabled: false}
+	}
+	nc, err := notion.New(notion.Config{APIKey: key, HTTPTimeout: 30 * time.Second})
+	if err != nil {
+		log.Printf("scheduler init error: %v", err)
+		return &scheduler{enabled: false}
+	}
+	return &scheduler{
+		enabled:      true,
+		nc:           nc,
+		gm:           gm,
+		dsBots:       dsBots,
+		dsLogs:       dsLogs,
+		botIDByPageID: make(map[string]string, 64),
+	}
+}
+
+type scheduleRunResult struct {
+	Processed int
+	Sent      int
+	Errors    int
+}
+
+func (s *scheduler) runOnce(ctx context.Context) (scheduleRunResult, error) {
+	now := time.Now().UTC()
+
+	// (Send Now == true) OR (Schedule Enabled == true AND Next Run At <= now)
+	req := map[string]any{
+		"filter": map[string]any{
+			"or": []any{
+				map[string]any{
+					"property": "Send Now",
+					"checkbox": map[string]any{"equals": true},
+				},
+				map[string]any{
+					"and": []any{
+						map[string]any{
+							"property": "Schedule Enabled",
+							"checkbox": map[string]any{"equals": true},
+						},
+						map[string]any{
+							"property": "Next Run At",
+							"date": map[string]any{"on_or_before": now.Format(time.RFC3339)},
+						},
+					},
+				},
+			},
+		},
+		"page_size": 100,
+	}
+
+	pages, err := s.nc.QueryAllPages(ctx, s.dsLogs, req)
+	if err != nil {
+		return scheduleRunResult{}, err
+	}
+
+	var res scheduleRunResult
+	for _, p := range pages {
+		res.Processed++
+		if err := s.processOne(ctx, p); err != nil {
+			res.Errors++
+			continue
+		}
+		res.Sent++
+	}
+	return res, nil
+}
+
+func (s *scheduler) processOne(ctx context.Context, p notion.PageObject) error {
+	if s == nil || !s.enabled || s.nc == nil || s.gm == nil {
+		return fmt.Errorf("scheduler not initialized")
+	}
+
+	text := strings.TrimSpace(notion.RichTextPlainText(p.Properties, "Message Text"))
+	if text == "" {
+		return s.markError(ctx, p.ID, "missing Message Text")
+	}
+
+	botPageIDs := notion.RelationIDs(p.Properties, "Bot")
+	if len(botPageIDs) == 0 {
+		return s.markError(ctx, p.ID, "missing Bot relation")
+	}
+	botID, err := s.resolveBotID(ctx, botPageIDs[0])
+	if err != nil || strings.TrimSpace(botID) == "" {
+		if err == nil {
+			err = fmt.Errorf("empty bot id")
+		}
+		return s.markError(ctx, p.ID, "failed to resolve Bot ID: "+err.Error())
+	}
+
+	// Send via GroupMe Bot API.
+	sendCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := s.gm.PostBotMessage(sendCtx, botID, text); err != nil {
+		return s.markError(ctx, p.ID, "groupme send failed: "+err.Error())
+	}
+
+	now := time.Now().UTC()
+	rec := notion.SelectName(p.Properties, "Recurrence")
+	nextAt, _ := notion.DateStartTime(p.Properties, "Next Run At")
+	if nextAt.IsZero() {
+		nextAt = now
+	}
+	newNext, hasNext := notion.NextRun(nextAt, rec)
+
+	updates := map[string]any{
+		"Send Now":     notion.Checkbox(false),
+		"Last Sent At": notion.DateTime(now),
+		"Status":       notion.Select("Sent"),
+		"Direction":    notion.Select("Outbound"),
+	}
+	if hasNext {
+		updates["Next Run At"] = notion.DateTime(newNext)
+		updates["Schedule Enabled"] = notion.Checkbox(true)
+		updates["Status"] = notion.Select("Scheduled")
+	}
+	return s.nc.UpdatePageProperties(ctx, p.ID, updates)
+}
+
+func (s *scheduler) resolveBotID(ctx context.Context, botPageID string) (string, error) {
+	pid := strings.TrimSpace(botPageID)
+	if pid == "" {
+		return "", fmt.Errorf("missing bot page id")
+	}
+	s.mu.RLock()
+	if v := strings.TrimSpace(s.botIDByPageID[pid]); v != "" {
+		s.mu.RUnlock()
+		return v, nil
+	}
+	s.mu.RUnlock()
+
+	page, err := s.nc.GetPage(ctx, pid)
+	if err != nil {
+		return "", err
+	}
+	if page == nil {
+		return "", fmt.Errorf("bot page not found")
+	}
+	botID := strings.TrimSpace(notion.TitlePlainText(page.Properties, "Bot ID"))
+	if botID == "" {
+		return "", fmt.Errorf("Bot ID property empty")
+	}
+	s.mu.Lock()
+	s.botIDByPageID[pid] = botID
+	s.mu.Unlock()
+	return botID, nil
+}
+
+func (s *scheduler) markError(ctx context.Context, pageID, msg string) error {
+	updates := map[string]any{
+		"Status":     notion.Select("Error"),
+		"Last Error": notion.RichText(msg),
+		"Send Now":   notion.Checkbox(false),
+	}
+	_ = s.nc.UpdatePageProperties(ctx, pageID, updates)
+	return errors.New(msg)
 }

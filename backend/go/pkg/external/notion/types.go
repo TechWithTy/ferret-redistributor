@@ -7,6 +7,9 @@ type pageRef struct {
 	URL string `json:"url"`
 }
 
+// PageRef is an exported alias for the minimal Notion page reference.
+type PageRef = pageRef
+
 type queryResponse struct {
 	Results []pageRef `json:"results"`
 }
@@ -23,6 +26,9 @@ type pageObject struct {
 	Properties map[string]propertyValue `json:"properties"`
 }
 
+// PageObject is an exported alias for a Notion page object (with properties).
+type PageObject = pageObject
+
 type propertyValue struct {
 	Type string `json:"type"`
 
@@ -36,6 +42,9 @@ type propertyValue struct {
 	Relation []relationRef `json:"relation,omitempty"`
 	// include other fields as needed over time
 }
+
+// PropertyValue is an exported alias for a Notion property value.
+type PropertyValue = propertyValue
 
 type richText struct {
 	PlainText string `json:"plain_text"`
