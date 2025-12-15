@@ -8,7 +8,7 @@ Prereqs
 - (Optional) OTel collector for telemetry
 
 Steps
-1. Configure env in `.env` or shell
+1. Configure env in `.env` or shell (template: `backend/env.example`)
 2. Apply migrations: `DATABASE_URL=postgres://... make db-migrate`
 3. Build poster/scheduler binaries or run via `go run`
 4. API: install Gin (network required): `go get github.com/gin-gonic/gin`

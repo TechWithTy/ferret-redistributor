@@ -1,0 +1,12 @@
+{
+  "id": "m_123",
+  "group_id": "g_123",
+  "sender_id": "u_123",
+  "sender_type": "user",
+  "name": "Alice",
+  "text": "!ping",
+  "system": false,
+  "created_at": 1734220800
+}
+
+
