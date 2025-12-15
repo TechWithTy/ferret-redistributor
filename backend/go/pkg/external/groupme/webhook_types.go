@@ -24,4 +24,5 @@ type WebhookEvent struct {
 	Name       string
 	Text       string
 	System     bool
+	CreatedAt  int64
 }

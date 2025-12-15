@@ -81,23 +81,7 @@ func (c *Client) QueryPageRefsByTitle(ctx context.Context, dataSourceID, titlePr
 }
 
 func titleFromProperties(props map[string]propertyValue, titlePropName string) string {
-	if props == nil {
-		return ""
-	}
-	p, ok := props[titlePropName]
-	if !ok {
-		return ""
-	}
-	if strings.ToLower(strings.TrimSpace(p.Type)) != "title" {
-		return ""
-	}
-	for _, rt := range p.Title {
-		if strings.TrimSpace(rt.PlainText) != "" {
-			// Title can be split across segments; join if needed later.
-			return rt.PlainText
-		}
-	}
-	return ""
+	return TitlePlainText(props, titlePropName)
 }
 
 // CreatePageInDataSource creates a new page under the given data source.

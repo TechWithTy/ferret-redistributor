@@ -31,6 +31,14 @@ func RichText(content string) map[string]any {
 	}
 }
 
+func Select(name string) map[string]any {
+	return map[string]any{
+		"select": map[string]any{
+			"name": name,
+		},
+	}
+}
+
 func URL(u string) map[string]any {
 	return map[string]any{"url": u}
 }

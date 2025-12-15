@@ -66,6 +66,7 @@ func ParseAndValidateWebhook(r *http.Request, cfg WebhookConfig) (WebhookEvent, 
 		Name:       payload.Name,
 		Text:       payload.Text,
 		System:     payload.System,
+		CreatedAt:  payload.CreatedAt,
 	}, nil
 }
 

@@ -19,6 +19,11 @@ Required:
 Optional:
 - `GROUPME_PORT`: default `8081`
 - `GROUPME_BASE_URL`: default `https://api.groupme.com/v3`
+- Notion logging (best-effort, non-blocking):
+  - `NOTION_API_KEY` (or `NOTION_TOKEN` / `NOTION_KEY`)
+  - `NOTION_DATA_SOURCE_ID_BOT_MESSAGE_LOGS`
+  - `NOTION_DATA_SOURCE_ID_BOTS` (to link `Bot` relation)
+  - `NOTION_DATA_SOURCE_ID_GROUPS` (to link `Group` relation)
 
 See [`env.example`](../../../env.example) (rename to `.env` for local use).
 

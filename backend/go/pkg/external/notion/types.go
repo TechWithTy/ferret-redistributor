@@ -24,11 +24,32 @@ type pageObject struct {
 }
 
 type propertyValue struct {
-	Type  string     `json:"type"`
-	Title []richText `json:"title"`
+	Type string `json:"type"`
+
+	Title    []richText    `json:"title,omitempty"`
+	RichText []richText    `json:"rich_text,omitempty"`
+	Number   *float64      `json:"number,omitempty"`
+	Checkbox *bool         `json:"checkbox,omitempty"`
+	URL      *string       `json:"url,omitempty"`
+	Select   *selectValue  `json:"select,omitempty"`
+	Date     *dateValue    `json:"date,omitempty"`
+	Relation []relationRef `json:"relation,omitempty"`
 	// include other fields as needed over time
 }
 
 type richText struct {
 	PlainText string `json:"plain_text"`
+}
+
+type selectValue struct {
+	Name string `json:"name"`
+}
+
+type dateValue struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
+
+type relationRef struct {
+	ID string `json:"id"`
 }

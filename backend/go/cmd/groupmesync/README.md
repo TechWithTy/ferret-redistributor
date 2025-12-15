@@ -29,6 +29,32 @@ go run ./cmd/groupmesync
 go run ./cmd/groupmesync --apply
 ```
 
+## Update engagement metrics (optional)
+
+This aggregates Notion **Bot Message Logs** into **Group Engagement Metrics**.
+
+Additional required env vars:
+- `NOTION_DATA_SOURCE_ID_BOT_MESSAGE_LOGS`
+- `NOTION_DATA_SOURCE_ID_GROUP_ENGAGEMENT_METRICS`
+
+Dry-run:
+
+```bash
+go run ./cmd/groupmesync --metrics
+```
+
+Apply:
+
+```bash
+go run ./cmd/groupmesync --metrics --apply
+```
+
+Metrics only (skip GroupMe API calls):
+
+```bash
+go run ./cmd/groupmesync --metrics-only --apply
+```
+
 ## Notes
 
 - Dry-run prints intended creates/updates without writing to Notion.
